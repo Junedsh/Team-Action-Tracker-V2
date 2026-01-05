@@ -12,8 +12,26 @@ let tasks = [];
 let teamMembers = [];
 let projects = [];
 
-// Filters
-let currentFilters = { status: 'All', priority: 'All', owner: 'All', project: 'All', search: '' };
+// Default Dates (Current Month)
+const today = new Date();
+const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+const formatDateInput = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+// Initial Filters
+let currentFilters = {
+    status: 'All',
+    priority: 'All',
+    owner: 'All',
+    project: 'All',
+    search: '',
+    startDate: formatDateInput(firstDay),
+    endDate: formatDateInput(today)
+};
 let currentView = 'list'; // 'list', 'kanban', 'calendar', 'projects'
 
 // --- DOM ELEMENTS ---
@@ -70,6 +88,12 @@ const filterStatus = document.getElementById('filter-status');
 const filterPriority = document.getElementById('filter-priority');
 const filterOwner = document.getElementById('filter-owner'); // Dynamic
 const filterProject = document.getElementById('filter-project'); // Dynamic
+const filterDateStart = document.getElementById('filter-date-start');
+const filterDateEnd = document.getElementById('filter-date-end');
+
+// Set Initial DOM Values
+if (filterDateStart) filterDateStart.value = currentFilters.startDate;
+if (filterDateEnd) filterDateEnd.value = currentFilters.endDate;
 
 // --- AUTH LOGIC (V3 MULTI-TEAM) ---
 
@@ -370,6 +394,8 @@ const rerenderAll = () => {
             (currentFilters.priority === 'All' || t.priority === currentFilters.priority) &&
             (currentFilters.owner === 'All' || t.owner === currentFilters.owner) &&
             (currentFilters.project === 'All' || t.project === currentFilters.project) &&
+            (!currentFilters.startDate || t.assigned_date >= currentFilters.startDate) &&
+            (!currentFilters.endDate || t.assigned_date <= currentFilters.endDate) &&
             (currentFilters.search === '' || t.description.toLowerCase().includes(currentFilters.search.toLowerCase()) || (t.owner && t.owner.toLowerCase().includes(currentFilters.search.toLowerCase())));
     });
 
@@ -471,6 +497,20 @@ document.addEventListener('click', (e) => {
         teamDropdown.classList.add('hidden');
     }
 });
+
+// Date Filter Listeners
+if (filterDateStart) {
+    filterDateStart.addEventListener('change', (e) => {
+        currentFilters.startDate = e.target.value;
+        rerenderAll();
+    });
+}
+if (filterDateEnd) {
+    filterDateEnd.addEventListener('change', (e) => {
+        currentFilters.endDate = e.target.value;
+        rerenderAll();
+    });
+}
 
 
 // ... Rest of listeners from previous app.js ...

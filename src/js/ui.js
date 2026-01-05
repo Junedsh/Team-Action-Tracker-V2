@@ -17,7 +17,22 @@ const ownerSelect = document.getElementById('task-owner');
 const teamListBody = document.getElementById('team-list-body');
 const projectListBody = document.getElementById('project-list-body');
 
-export const renderSummaryCards = (totalTasks, pendingTasks, inProgressTasks, overdueTasks) => {
+export const renderSummaryCards = (tasks) => {
+    const totalTasks = tasks.length;
+    let pendingTasks = 0;
+    let inProgressTasks = 0;
+    let overdueTasks = 0;
+
+    tasks.forEach(task => {
+        if (isOverdue(task)) {
+            overdueTasks++;
+        } else if (task.status === 'Pending') {
+            pendingTasks++;
+        } else if (task.status === 'In Progress') {
+            inProgressTasks++;
+        }
+    });
+
     summaryCardsContainer.innerHTML = `
         <div class="bg-gray-100 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-gray-800">${totalTasks}</p><p class="text-sm text-gray-500">Total Tasks</p></div>
         <div class="bg-yellow-100 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-yellow-800">${pendingTasks}</p><p class="text-sm text-yellow-600">Pending</p></div>
