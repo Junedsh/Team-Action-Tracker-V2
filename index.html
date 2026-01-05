@@ -78,7 +78,12 @@
 
     <!-- AUTH OVERLAY V2 -->
     <div id="auth-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-90 z-[100] flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full animate-fade-in-up">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full animate-fade-in-up relative">
+            <button id="auth-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hidden">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
             <div class="text-center mb-8">
                 <h2 id="auth-title" class="text-3xl font-bold text-gray-900">Welcome Back</h2>
                 <p id="auth-subtitle" class="text-gray-500 mt-2">Sign in to access your team's dashboard</p>
@@ -200,17 +205,17 @@
                         <option>Done</option>
                         <option>Overdue</option>
                     </select>
-                    <div class="relative">
+                    <div>
+                        <label for="filter-date-start" class="block text-xs font-medium text-gray-700 mb-1">Start
+                            Date</label>
                         <input type="date" id="filter-date-start"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-500">
-                        <label for="filter-date-start"
-                            class="absolute top-2 left-2 text-gray-400 text-sm pointer-events-none">Start Date</label>
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-600">
                     </div>
-                    <div class="relative">
+                    <div>
+                        <label for="filter-date-end" class="block text-xs font-medium text-gray-700 mb-1">End
+                            Date</label>
                         <input type="date" id="filter-date-end"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-500">
-                        <label for="filter-date-end"
-                            class="absolute top-2 left-2 text-gray-400 text-sm pointer-events-none">End Date</label>
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-600">
                     </div>
                 </div>
             </div>

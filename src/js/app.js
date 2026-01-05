@@ -41,6 +41,7 @@ const authForm = document.getElementById('auth-form');
 const authEmail = document.getElementById('auth-email');
 const authPassword = document.getElementById('auth-password');
 const authErrorBox = document.getElementById('auth-error-box');
+const authCloseBtn = document.getElementById('auth-close-btn');
 const toggleAuthModeBtn = document.getElementById('toggle-auth-mode-btn');
 const authSubmitBtn = document.getElementById('auth-submit-btn');
 const authTitle = document.getElementById('auth-title');
@@ -147,11 +148,25 @@ const openAddTeamModal = () => {
     signupFields.classList.remove('hidden');
 
     // Hide Auth Credentials
+    // Hide Auth Credentials & Name (Since already logged in)
     authEmail.parentElement.style.display = 'none';
     authPassword.parentElement.style.display = 'none';
+    authName.parentElement.style.display = 'none'; // Hide Name Field
     toggleAuthModeBtn.style.display = 'none';
+    authCloseBtn.classList.remove('hidden'); // Show Close Button
 
     setSignupType('join');
+};
+
+// Close Auth Modal (Only applicable when it's closed via button in "Add Team" mode)
+const closeAuthModal = () => {
+    authOverlay.classList.add('hidden');
+    // Reset state for next time (re-show fields needed for normal logout/login flow)
+    authName.parentElement.style.display = 'block';
+    authEmail.parentElement.style.display = 'block';
+    authPassword.parentElement.style.display = 'block';
+    toggleAuthModeBtn.style.display = 'block';
+    authCloseBtn.classList.add('hidden');
 };
 
 const handleAuth = async (e) => {
@@ -480,6 +495,7 @@ const checkSession = async () => {
 };
 
 // Wiring Events
+if (authCloseBtn) authCloseBtn.addEventListener('click', closeAuthModal);
 if (authForm) authForm.addEventListener('submit', handleAuth);
 if (toggleAuthModeBtn) toggleAuthModeBtn.addEventListener('click', toggleAuthMode);
 if (btnModeJoin) btnModeJoin.addEventListener('click', () => setSignupType('join'));
