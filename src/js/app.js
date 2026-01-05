@@ -22,7 +22,7 @@ const authOverlay = document.getElementById('auth-overlay');
 const authForm = document.getElementById('auth-form');
 const authEmail = document.getElementById('auth-email');
 const authPassword = document.getElementById('auth-password');
-const authErrorBox = document.getElementById('auth-error');
+const authErrorBox = document.getElementById('auth-error-box');
 const toggleAuthModeBtn = document.getElementById('toggle-auth-mode-btn');
 const authSubmitBtn = document.getElementById('auth-submit-btn');
 const authTitle = document.getElementById('auth-title');
@@ -41,7 +41,7 @@ const authTeamCode = document.getElementById('auth-team-code');
 const authTeamName = document.getElementById('auth-team-name');
 
 // Header & Navigation
-const userDisplay = document.getElementById('user-display');
+// const userDisplay = document.getElementById('user-display'); // Deprecated in V3
 const userNameDisplay = document.getElementById('user-name-display');
 const currentTeamDisplay = document.getElementById('current-team-display');
 const teamMenuBtn = document.getElementById('team-menu-btn');
@@ -54,10 +54,10 @@ const mainContent = document.getElementById('main-content');
 const tabButtons = document.querySelectorAll('.nav-btn');
 
 // Task Modal
-const addTaskBtn = document.getElementById('add-task-btn');
+const addTaskBtn = document.getElementById('open-add-task-modal-btn');
 const taskModal = document.getElementById('task-modal');
 const taskForm = document.getElementById('task-form');
-const cancelTaskBtn = document.getElementById('cancel-task-btn');
+const cancelTaskBtn = document.getElementById('close-task-modal-btn');
 const modalTitle = document.getElementById('modal-title');
 
 // Settings Forms
