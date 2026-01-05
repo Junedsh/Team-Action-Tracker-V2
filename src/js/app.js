@@ -171,10 +171,17 @@ const closeAuthModal = () => {
 
 const handleAuth = async (e) => {
     e.preventDefault();
+    console.log("Submit Auth Form Triggered");
+    console.log("Mode:", isSignUpMode ? "SignUp" : "SignIn");
+    console.log("Current User:", currentUser);
+
     authErrorBox.classList.add('hidden');
 
     const email = authEmail.value;
     const password = authPassword.value;
+
+    console.log("Email:", email); // Don't log password
+
 
     try {
         let userForSetup = currentUser; // Use existing user if logged in
@@ -601,5 +608,6 @@ const openEditModal = (task) => {
 
 
 // Start
+console.log("App.js Loaded. Starting Session Check...");
 checkSession();
 // UI.initializeCalendar(() => tasks); // Removed to fix crash. Calendar init needs refactoring.
