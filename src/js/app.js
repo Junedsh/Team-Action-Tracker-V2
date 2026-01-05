@@ -171,22 +171,16 @@ const closeAuthModal = () => {
 
 const handleAuth = async (e) => {
     e.preventDefault();
-    console.log("Submit Auth Form Triggered");
-    console.log("Mode:", isSignUpMode ? "SignUp" : "SignIn");
-    console.log("Current User:", currentUser);
-
     authErrorBox.classList.add('hidden');
 
     const email = authEmail.value;
     const password = authPassword.value;
 
-    console.log("Email:", email); // Don't log password
-
-
     try {
         let userForSetup = currentUser; // Use existing user if logged in
 
         if (isSignUpMode || currentUser) {
+            // ... (SignUp Logic Remains Unchanged) ...
             // Validate V2 Fields
             const fullName = authName.value.trim();
             // Name required only if we don't have a profile yet (checking visibility is a proxy)
@@ -211,7 +205,7 @@ const handleAuth = async (e) => {
 
             // 2. Handle Team Membership Logic (Junction Table)
             if (signupType.value === 'create') {
-                // Create Department
+                // ... Create Team Logic ...
                 const deptName = authTeamName.value.trim();
                 const accessCode = deptName.substring(0, 3).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
 
@@ -221,32 +215,28 @@ const handleAuth = async (e) => {
 
                 if (deptError) throw deptError;
 
-                // Add to Department Members (Admin)
                 const { error: joinError } = await supabase.from('department_members').insert([
                     { user_id: userForSetup.id, department_id: dept.id, role: 'Admin' }
                 ]);
                 if (joinError) throw joinError;
 
                 alert(`Team Created! Your Code is: ${accessCode}\nShare this with your team.`);
-                setActiveTeam(dept.id); // Set as active
+                setActiveTeam(dept.id);
 
             } else {
-                // Join Team
+                // ... Join Team Logic ...
                 const code = authTeamCode.value.trim().toUpperCase();
 
-                // Find Dept
                 const { data: dept, error: findError } = await supabase.from('departments').select('id, name')
                     .eq('access_code', code).single();
 
                 if (findError || !dept) throw new Error("Invalid Team Code.");
 
-                // Check if already member
                 const { data: existing } = await supabase.from('department_members')
                     .select('id').eq('user_id', userForSetup.id).eq('department_id', dept.id).single();
 
                 if (existing) throw new Error("You are already in this team!");
 
-                // Add to Department Members (Member)
                 const { error: joinError } = await supabase.from('department_members').insert([
                     { user_id: userForSetup.id, department_id: dept.id, role: 'Member' }
                 ]);
@@ -268,6 +258,9 @@ const handleAuth = async (e) => {
             // Sign In
             const { error } = await Auth.signIn(email, password);
             if (error) throw error;
+
+            // FIX: Refresh Session to update UI
+            await checkSession();
         }
 
     } catch (err) {
