@@ -63,6 +63,7 @@ export const renderTasks = (tasks, currentSort, attachActionListeners, updateSor
     attachActionListeners();
     updateSortIcons();
 };
+export const renderTaskList = renderTasks; // Alias
 
 export const renderTeamMembers = (teamMembers, deleteTeamMember) => {
     teamListBody.innerHTML = '';
@@ -113,6 +114,20 @@ export const populateDropdowns = (teamMembers, projects, currentFilters) => {
         ownerSelect.innerHTML += `<option value="${member.name}">${member.name}</option>`;
     });
     filterOwner.value = currentOwnerFilterValue;
+    filterOwner.value = currentOwnerFilterValue;
+};
+
+// Alias for app.js compatibility
+export const populateSelect = (selectElement, items, defaultText) => {
+    // Since app.js calls this generically, we implement a simple version or redirect if specific
+    // Note: app.js calls UI.populateSelect(element, array, default)
+    selectElement.innerHTML = '';
+    if (defaultText) {
+        selectElement.innerHTML += `<option value="">${defaultText}</option>`;
+    }
+    items.forEach(item => {
+        selectElement.innerHTML += `<option value="${item}">${item}</option>`;
+    });
 };
 
 export const renderProjectView = (tasks) => {

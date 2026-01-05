@@ -1,7 +1,7 @@
 import supabase from './supabaseClient.js';
 import * as Auth from './auth.js';
 import * as UI from './ui.js';
-import { formatDate, getStatusColor, getPriorityColor, calculatePromiseDifference } from './utils.js';
+import { formatDate, getStatusColors, getPriorityColors, calculatePromiseDifference } from './utils.js';
 
 // --- STATE ---
 let currentUser = null;
