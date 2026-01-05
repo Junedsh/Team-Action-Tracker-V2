@@ -153,9 +153,9 @@ const handleAuth = async (e) => {
 
                 if (findError || !dept) throw new Error("Invalid Team Code. Please ask your manager.");
 
-                // Create Profile (Member)
-                const { error: profileError } = await supabase.from('profiles').insert([
-                    { id: user.id, full_name: fullName, department_id: dept.id, role: 'Member' }
+                // Create Profile (Member) - Upsert
+                const { error: profileError } = await supabase.from('profiles').upsert([
+                    { id: userForSetup.id, full_name: fullName, department_id: dept.id, role: 'Member' }
                 ]);
                 if (profileError) throw profileError;
             }
@@ -200,10 +200,26 @@ const updateAuthUI = async (user) => {
             // Initial Fetch
             fetchData();
         } else {
-            console.error("User has no profile!");
-            alert("Profile not found. Please contact support.");
-            await Auth.signOut();
-            window.location.reload();
+            // Edge case: User has login but no profile (Zombie User)
+            console.log("User logged in but missing profile. Triggering Setup Mode.");
+
+            authOverlay.classList.remove('hidden');
+
+            // Setup UI for completion
+            isSignUpMode = true;
+            if (toggleAuthModeBtn) toggleAuthModeBtn.style.display = 'none'; // Lock to setup
+            authTitle.textContent = "Complete Your Profile";
+            authSubtitle.textContent = "Almost there! Create or Join a team.";
+            authSubmitBtn.textContent = "Finish Setup";
+            signupFields.classList.remove('hidden');
+            authErrorBox.classList.add('hidden');
+
+            // Hide Password field as it's not needed (already auth), but keep email read-only
+            if (authPassword) authPassword.parentElement.style.display = 'none';
+            if (authEmail) {
+                authEmail.value = user.email;
+                authEmail.readOnly = true;
+            }
         }
     } else {
         authOverlay.classList.remove('hidden');
