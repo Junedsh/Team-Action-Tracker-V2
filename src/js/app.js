@@ -297,7 +297,12 @@ const updateAuthUI = async (user) => {
         // Render UI
         authOverlay.classList.add('hidden');
         mainContent.classList.remove('blur-sm', 'pointer-events-none');
-        userDisplay.classList.remove('hidden');
+        authOverlay.classList.add('hidden');
+        mainContent.classList.remove('blur-sm', 'pointer-events-none');
+
+        // Show Header Controls
+        logoutBtn.classList.remove('hidden');
+        teamMenuBtn.classList.remove('hidden');
 
         userNameDisplay.textContent = profile.full_name;
         currentTeamDisplay.textContent = currentDepartment.name;
@@ -315,7 +320,12 @@ const updateAuthUI = async (user) => {
     } else {
         authOverlay.classList.remove('hidden');
         mainContent.classList.add('blur-sm', 'pointer-events-none');
-        userDisplay.classList.add('hidden');
+        authOverlay.classList.remove('hidden');
+        mainContent.classList.add('blur-sm', 'pointer-events-none');
+
+        // Hide Header Controls
+        logoutBtn.classList.add('hidden');
+        teamMenuBtn.classList.add('hidden');
     }
 };
 
