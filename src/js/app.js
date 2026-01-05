@@ -110,7 +110,9 @@ const handleAuth = async (e) => {
     const password = authPassword.value;
 
     try {
-        if (isSignUpMode) {
+        let userForSetup = currentUser;
+
+        if (isSignUpMode || currentUser) {
             // Validate V2 Fields
             const fullName = authName.value.trim();
             if (!fullName) throw new Error("Full Name is required.");
@@ -119,9 +121,13 @@ const handleAuth = async (e) => {
             if (signupType.value === 'create' && !authTeamName.value.trim()) throw new Error("Team Name is required.");
 
             // 1. Sign Up User
-            const { data: { user }, error: signUpError } = await Auth.signUp(email, password);
-            if (signUpError) throw signUpError;
-            if (!user) throw new Error("Signup failed.");
+            if (!userForSetup) {
+                const { data: { user }, error: signUpError } = await Auth.signUp(email, password);
+                if (signUpError) throw signUpError;
+                if (!user) throw new Error("Signup failed.");
+                userForSetup = user;
+            }
+
 
             // 2. Handle Team Logic
             if (signupType.value === 'create') {
@@ -135,10 +141,10 @@ const handleAuth = async (e) => {
 
                 if (deptError) throw deptError;
 
-                // Create Profile (Admin)
-                const { error: profileError } = await supabase.from('profiles').insert([
-                    { id: user.id, full_name: fullName, department_id: dept.id, role: 'Admin' }
-                ]);
+                // Create Profile (Admin) - Upsert
+                const { error: profileError } = await supabase.from('profiles').upsert([
+                    { id: userForSetup.id, full_name: fullName, department_id: dept.id, role: 'Admin' }
+                ]).select();
                 if (profileError) throw profileError;
 
                 alert(`Team Created! Your Code is: ${accessCode}\nShare this with your team.`);
@@ -156,7 +162,7 @@ const handleAuth = async (e) => {
                 // Create Profile (Member) - Upsert
                 const { error: profileError } = await supabase.from('profiles').upsert([
                     { id: userForSetup.id, full_name: fullName, department_id: dept.id, role: 'Member' }
-                ]);
+                ]).select();
                 if (profileError) throw profileError;
             }
 
