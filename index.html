@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
@@ -23,13 +24,94 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <h1 class="text-2xl font-bold text-white">Team Action Tracker</h1>
+                    <h1 class="text-2xl font-bold text-white">Team Action Tracker <span
+                            class="text-xs bg-indigo-500 px-2 py-1 rounded ml-2">V2</span></h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="user-display" class="text-gray-300 text-sm hidden"></span>
+                    <button id="logout-btn" class="text-gray-300 hover:text-white hidden">Logout</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- AUTH OVERLAY V2 -->
+    <div id="auth-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-90 z-[100] flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full animate-fade-in-up">
+            <div class="text-center mb-8">
+                <h2 id="auth-title" class="text-3xl font-bold text-gray-900">Welcome Back</h2>
+                <p id="auth-subtitle" class="text-gray-500 mt-2">Sign in to access your team's dashboard</p>
+            </div>
+
+            <div id="auth-error-box" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded text-sm"></div>
+
+            <form id="auth-form" class="space-y-6">
+                <!-- Basic Credentials -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input type="email" id="auth-email" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="auth-password" required minlength="6"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border">
+                </div>
+
+                <!-- V2 EXTENSIONS: Team Logic (Only visible in SignUp mode) -->
+                <div id="signup-fields" class="hidden space-y-4 pt-4 border-t border-gray-200">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="auth-name" placeholder="John Doe"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border">
+                    </div>
+
+                    <div class="flex space-x-4 mb-2">
+                        <button type="button" id="btn-mode-join"
+                            class="flex-1 py-2 px-4 border rounded-md text-sm font-medium focus:outline-none bg-indigo-50 text-indigo-700 border-indigo-200">
+                            Join Team
+                        </button>
+                        <button type="button" id="btn-mode-create"
+                            class="flex-1 py-2 px-4 border rounded-md text-sm font-medium text-gray-700 bg-white border-gray-300 hover:bg-gray-50">
+                            Create Team
+                        </button>
+                    </div>
+                    <input type="hidden" id="signup-type" value="join">
+
+                    <!-- Join Team -->
+                    <div id="field-team-code">
+                        <label class="block text-sm font-medium text-gray-700">Team Code</label>
+                        <input type="text" id="auth-team-code" placeholder="e.g. MKT-2024"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border uppercase tracking-wider">
+                        <p class="text-xs text-gray-500 mt-1">Ask your manager for the code.</p>
+                    </div>
+
+                    <!-- Create Team -->
+                    <div id="field-team-name" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700">New Team Name</label>
+                        <input type="text" id="auth-team-name" placeholder="e.g. Marketing Dept"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border">
+                        <p class="text-xs text-gray-500 mt-1">We'll generate a code for you.</p>
+                    </div>
+                </div>
+
+                <button type="submit" id="auth-submit-btn"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button id="toggle-auth-mode-btn" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
+                    Need an account? Sign Up
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT (Initially Hidden/Blurred) -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 filter blur-sm transition-all duration-300 pointer-events-none"
+        id="main-content">
         <div class="bg-white rounded-lg shadow">
             <div class="p-6">
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-4">

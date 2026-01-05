@@ -1,0 +1,39 @@
+
+import supabase from './supabaseClient.js';
+
+// Sign Up (standard email/pass)
+export const signUp = async (email, password) => {
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+    });
+    return { data, error };
+};
+
+// Sign In
+export const signIn = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+    });
+    return { data, error };
+};
+
+// Sign Out
+export const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    return { error };
+};
+
+// Get User
+export const getUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    return user;
+};
+
+// Listen for Auth Changes
+export const onAuthStateChange = (callback) => {
+    supabase.auth.onAuthStateChange((event, session) => {
+        callback(event, session);
+    });
+};

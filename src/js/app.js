@@ -1,6 +1,7 @@
 
 import supabase from './supabaseClient.js';
 import * as UI from './ui.js';
+import * as Auth from './auth.js';
 import { formatDate, isOverdue, calculatePromiseDifference } from './utils.js';
 
 // --- DATA STORE ---
@@ -17,8 +18,35 @@ const calendar = { current: null };
 // --- STATE MANAGEMENT ---
 let currentFilters = { search: '', owner: 'all', status: 'all', dateStart: null, dateEnd: null, project: 'all', priority: 'all' };
 let currentSort = { key: 'promise_date', order: 'asc' };
+let currentUser = null;
+let currentDepartment = null;
 
 // --- ELEMENT SELECTORS ---
+const mainContent = document.getElementById('main-content');
+const navBar = document.querySelector('nav');
+const authOverlay = document.getElementById('auth-overlay');
+const authForm = document.getElementById('auth-form');
+const authTitle = document.getElementById('auth-title');
+const authSubtitle = document.getElementById('auth-subtitle');
+const authEmail = document.getElementById('auth-email');
+const authPassword = document.getElementById('auth-password');
+const authName = document.getElementById('auth-name');
+const authErrorBox = document.getElementById('auth-error-box');
+const authSubmitBtn = document.getElementById('auth-submit-btn');
+const toggleAuthModeBtn = document.getElementById('toggle-auth-mode-btn');
+
+// V2 Auth Selectors
+const signupFields = document.getElementById('signup-fields');
+const btnModeJoin = document.getElementById('btn-mode-join');
+const btnModeCreate = document.getElementById('btn-mode-create');
+const fieldTeamCode = document.getElementById('field-team-code');
+const fieldTeamName = document.getElementById('field-team-name');
+const authTeamCode = document.getElementById('auth-team-code');
+const authTeamName = document.getElementById('auth-team-name');
+const signupType = document.getElementById('signup-type');
+const userDisplay = document.getElementById('user-display');
+const logoutBtn = document.getElementById('logout-btn');
+
 const filterOwner = document.getElementById('filter-owner');
 const filterStatus = document.getElementById('filter-status');
 const filterProject = document.getElementById('filter-project');
@@ -37,6 +65,158 @@ const modalSubmitBtn = document.getElementById('modal-submit-btn');
 const ownerSelect = document.getElementById('task-owner');
 const ownerHelperText = document.getElementById('owner-helper-text');
 const calendarEl = document.getElementById('calendar');
+
+// --- DATA FETCHING ---
+
+// --- AUTH LOGIC (V2) ---
+let isSignUpMode = false;
+
+const toggleAuthMode = () => {
+    isSignUpMode = !isSignUpMode;
+    // UI Updates
+    authTitle.textContent = isSignUpMode ? 'Create Account' : 'Welcome Back';
+    authSubtitle.textContent = isSignUpMode ? 'Join or create a team to get started' : 'Sign in to access your team\'s dashboard';
+    authSubmitBtn.textContent = isSignUpMode ? 'Sign Up' : 'Sign In';
+    toggleAuthModeBtn.textContent = isSignUpMode ? 'Already have an account? Sign In' : 'Need an account? Sign Up';
+    signupFields.classList.toggle('hidden', !isSignUpMode);
+    authErrorBox.classList.add('hidden');
+};
+
+const setSignupType = (type) => {
+    signupType.value = type;
+    // Update Button Styles
+    if (type === 'join') {
+        btnModeJoin.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+        btnModeJoin.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+        btnModeCreate.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+        btnModeCreate.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+        fieldTeamCode.classList.remove('hidden');
+        fieldTeamName.classList.add('hidden');
+    } else {
+        btnModeCreate.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+        btnModeCreate.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+        btnModeJoin.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+        btnModeJoin.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+        fieldTeamName.classList.remove('hidden');
+        fieldTeamCode.classList.add('hidden');
+    }
+};
+
+const handleAuth = async (e) => {
+    e.preventDefault();
+    authErrorBox.classList.add('hidden');
+
+    const email = authEmail.value;
+    const password = authPassword.value;
+
+    try {
+        if (isSignUpMode) {
+            // Validate V2 Fields
+            const fullName = authName.value.trim();
+            if (!fullName) throw new Error("Full Name is required.");
+
+            if (signupType.value === 'join' && !authTeamCode.value.trim()) throw new Error("Team Code is required.");
+            if (signupType.value === 'create' && !authTeamName.value.trim()) throw new Error("Team Name is required.");
+
+            // 1. Sign Up User
+            const { data: { user }, error: signUpError } = await Auth.signUp(email, password);
+            if (signUpError) throw signUpError;
+            if (!user) throw new Error("Signup failed.");
+
+            // 2. Handle Team Logic
+            if (signupType.value === 'create') {
+                // Create Department
+                const deptName = authTeamName.value.trim();
+                const accessCode = deptName.substring(0, 3).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
+
+                const { data: dept, error: deptError } = await supabase.from('departments').insert([
+                    { name: deptName, access_code: accessCode }
+                ]).select().single();
+
+                if (deptError) throw deptError;
+
+                // Create Profile (Admin)
+                const { error: profileError } = await supabase.from('profiles').insert([
+                    { id: user.id, full_name: fullName, department_id: dept.id, role: 'Admin' }
+                ]);
+                if (profileError) throw profileError;
+
+                alert(`Team Created! Your Code is: ${accessCode}\nShare this with your team.`);
+
+            } else {
+                // Join Team
+                const code = authTeamCode.value.trim().toUpperCase();
+
+                // Find Dept
+                const { data: dept, error: findError } = await supabase.from('departments').select('id, name')
+                    .eq('access_code', code).single();
+
+                if (findError || !dept) throw new Error("Invalid Team Code. Please ask your manager.");
+
+                // Create Profile (Member)
+                const { error: profileError } = await supabase.from('profiles').insert([
+                    { id: user.id, full_name: fullName, department_id: dept.id, role: 'Member' }
+                ]);
+                if (profileError) throw profileError;
+            }
+
+            isSignUpMode = false;
+            toggleAuthModeBtn.click(); // Reset UI
+            alert("Account created successfully! You are now logged in.");
+
+        } else {
+            // Sign In
+            const { error } = await Auth.signIn(email, password);
+            if (error) throw error;
+        }
+
+    } catch (err) {
+        authErrorBox.textContent = err.message;
+        authErrorBox.classList.remove('hidden');
+    }
+};
+
+const handleLogout = async () => {
+    await Auth.signOut();
+    window.location.reload();
+};
+
+const updateAuthUI = async (user) => {
+    if (user) {
+        currentUser = user;
+        // Fetch Profile & Department
+        const { data: profile } = await supabase.from('profiles').select('*, departments(name, access_code)').eq('id', user.id).single();
+
+        if (profile) {
+            currentDepartment = profile.departments;
+            authOverlay.classList.add('hidden');
+            mainContent.classList.remove('blur-sm', 'pointer-events-none'); // Unlock Main
+
+            // Update Header
+            userDisplay.textContent = `${profile.full_name} (${currentDepartment.name})`;
+            userDisplay.classList.remove('hidden');
+            logoutBtn.classList.remove('hidden');
+
+            // Initial Fetch
+            fetchData();
+        } else {
+            console.error("User has no profile!");
+            alert("Profile not found. Please contact support.");
+            await Auth.signOut();
+            window.location.reload();
+        }
+    } else {
+        authOverlay.classList.remove('hidden');
+        mainContent.classList.add('blur-sm', 'pointer-events-none');
+        userDisplay.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+    }
+};
+
+const checkSession = async () => {
+    const user = await Auth.getUser();
+    updateAuthUI(user);
+};
 
 // --- DATA FETCHING ---
 const fetchData = async () => {
@@ -182,12 +362,14 @@ const deleteProject = async (id) => {
 };
 
 const addTeamMember = async (name, designation) => {
-    const { error } = await supabase.from('team_members').insert([{ name, designation }]);
+    if (!currentDepartment) return;
+    const { error } = await supabase.from('team_members').insert([{ name, designation, department_id: currentDepartment.id }]);
     if (error) alert('Error adding member: ' + error.message);
 };
 
 const addProject = async (name) => {
-    const { error } = await supabase.from('projects').insert([{ name }]);
+    if (!currentDepartment) return;
+    const { error } = await supabase.from('projects').insert([{ name, department_id: currentDepartment.id }]);
     if (error) alert('Error adding project: ' + error.message);
 };
 
@@ -266,6 +448,7 @@ taskForm.addEventListener('submit', async (e) => {
 
         const assignedDate = new Date().toISOString().split('T')[0];
         const rows = selectedOwners.map(owner => ({
+            department_id: currentDepartment.id,
             project, description, owner, priority,
             assigned_date: assignedDate,
             promise_date: promiseDate,
@@ -292,6 +475,17 @@ projectForm.addEventListener('submit', e => {
     const name = e.target['project-name'].value.trim();
     if (name) addProject(name);
     e.target.reset();
+});
+
+// --- AUTH EVENT LISTENERS ---
+if (authForm) authForm.addEventListener('submit', handleAuth);
+if (toggleAuthModeBtn) toggleAuthModeBtn.addEventListener('click', toggleAuthMode);
+if (btnModeJoin) btnModeJoin.addEventListener('click', () => setSignupType('join'));
+if (btnModeCreate) btnModeCreate.addEventListener('click', () => setSignupType('create'));
+if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+
+Auth.onAuthStateChange((event, session) => {
+    checkSession();
 });
 
 // --- GENERAL EVENT LISTENERS ---
@@ -429,6 +623,6 @@ const initializeCalendar = () => {
 };
 
 setDefaultDateFilters();
-fetchData();
 initializeCalendar();
 switchTab('list');
+checkSession();
