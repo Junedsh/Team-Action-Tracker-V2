@@ -281,12 +281,36 @@ const setActiveTeam = (deptId) => {
     // Reload state with new active team
     const team = myTeams.find(t => t.department_id === deptId);
     if (team) {
-        currentDepartment = { id: team.department_id, name: team.departments.name, access_code: team.departments.access_code };
+        currentDepartment = {
+            id: team.department_id,
+            name: team.departments.name,
+            access_code: team.departments.access_code,
+            role: team.role
+        };
         currentTeamDisplay.textContent = currentDepartment.name;
+
+        updateRoleUI(currentDepartment.role); // Update UI
+
         // Fetch new data
         fetchData();
         // Close dropdown
         teamDropdown.classList.add('hidden');
+    }
+};
+
+const updateRoleUI = (role) => {
+    const userRoleDisplay = document.getElementById('user-role-display');
+    const manageTeamBtn = document.getElementById('manage-team-btn');
+    const manageProjectBtn = document.getElementById('manage-project-btn');
+
+    if (userRoleDisplay) userRoleDisplay.textContent = role === 'Admin' ? 'Admin' : 'Team Member';
+
+    if (role === 'Admin') {
+        if (manageTeamBtn) manageTeamBtn.classList.remove('hidden');
+        if (manageProjectBtn) manageProjectBtn.classList.remove('hidden');
+    } else {
+        if (manageTeamBtn) manageTeamBtn.classList.add('hidden');
+        if (manageProjectBtn) manageProjectBtn.classList.add('hidden');
     }
 };
 
@@ -330,7 +354,8 @@ const updateAuthUI = async (user) => {
         currentDepartment = {
             id: activeTeam.department_id,
             name: activeTeam.departments.name,
-            access_code: activeTeam.departments.access_code
+            access_code: activeTeam.departments.access_code,
+            role: activeTeam.role // Added Role
         };
 
         // Render UI
@@ -345,6 +370,8 @@ const updateAuthUI = async (user) => {
 
         userNameDisplay.textContent = profile.full_name;
         currentTeamDisplay.textContent = currentDepartment.name;
+
+        updateRoleUI(currentDepartment.role); // Update Role UI
 
         // Render Dropdown
         teamListContainer.innerHTML = myTeams.map(t => `
