@@ -88,7 +88,20 @@ const searchInput = document.getElementById('search-input');
 const filterStatus = document.getElementById('filter-status');
 const filterPriority = document.getElementById('filter-priority');
 const filterOwner = document.getElementById('filter-owner'); // Dynamic
+const filterOwner = document.getElementById('filter-owner'); // Dynamic
 const filterProject = document.getElementById('filter-project'); // Dynamic
+const filterDateStart = document.getElementById('filter-date-start');
+const filterDateEnd = document.getElementById('filter-date-end');
+
+// Admin Modals
+const manageTeamBtn = document.getElementById('manage-team-btn');
+const manageProjectBtn = document.getElementById('manage-project-btn');
+const teamModal = document.getElementById('team-modal');
+const projectModal = document.getElementById('project-modal');
+const closeTeamModalBtn = document.getElementById('close-team-modal-btn');
+const closeProjectModalBtn = document.getElementById('close-project-modal-btn');
+const teamListBody = document.getElementById('team-list-body');
+const projectListBody = document.getElementById('project-list-body');
 const filterDateStart = document.getElementById('filter-date-start');
 const filterDateEnd = document.getElementById('filter-date-end');
 
@@ -466,7 +479,86 @@ const addProject = async (name) => {
         { department_id: currentDepartment.id, name }
     ]);
     if (error) alert(error.message);
-    else fetchData();
+    else {
+        await fetchData();
+        renderProjectManagementList(); // Refresh list if open
+    }
+};
+
+// --- ADMIN MANAGEMENT FUNCTIONS ---
+
+window.openManageTeamModal = () => {
+    teamModal.classList.remove('hidden');
+    renderTeamManagementList();
+};
+
+const renderTeamManagementList = () => {
+    teamListBody.innerHTML = teamMembers.map(member => {
+        const isSelf = member.user_id === currentUser.id;
+        // Don't show remove button for self
+        const actionBtn = isSelf ?
+            '<span class="text-gray-400 text-xs italic">You</span>' :
+            `<button onclick="removeTeamMember('${member.id}')" class="text-red-600 hover:text-red-900 text-sm">Remove</button>`;
+
+        return `
+            <tr>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${member.name}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${member.role}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${actionBtn}</td>
+            </tr>
+        `;
+    }).join('');
+};
+
+window.removeTeamMember = async (memberId) => {
+    if (!confirm("Are you sure you want to remove this member?")) return;
+
+    // We delete from department_members (junction table)
+    // Note: 'id' in teamMembers array comes from the VIEW which might select profile ID or department_member ID.
+    // Let's check fetchData. It selects '*' from department_members. Good.
+
+    const { error } = await supabase.from('department_members').delete().eq('id', memberId);
+
+    if (error) {
+        alert("Error removing member: " + error.message);
+    } else {
+        // Remove from local array immediately for UI responsiveness
+        teamMembers = teamMembers.filter(m => m.id !== memberId);
+        renderTeamManagementList();
+
+        // Also refresh main data to update filters etc
+        fetchData();
+    }
+};
+
+window.openManageProjectModal = () => {
+    projectModal.classList.remove('hidden');
+    renderProjectManagementList();
+};
+
+const renderProjectManagementList = () => {
+    projectListBody.innerHTML = projects.map(proj => `
+        <tr>
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${proj.name}</td>
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                <button onclick="removeProject('${proj.id}')" class="text-red-600 hover:text-red-900 text-sm">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+};
+
+window.removeProject = async (projectId) => {
+    if (!confirm("Delete this project?")) return;
+
+    const { error } = await supabase.from('projects').delete().eq('id', projectId);
+
+    if (error) {
+        alert("Error deleting project: " + error.message);
+    } else {
+        projects = projects.filter(p => p.id !== projectId);
+        renderProjectManagementList();
+        fetchData();
+    }
 };
 
 const addTask = async (e) => {
@@ -579,11 +671,23 @@ teamForm.addEventListener('submit', e => {
     addTeamMember(e.target['member-name'].value, e.target['member-email'].value, e.target['member-designation'].value);
     e.target.reset();
 });
+// Settings forms
+// Team Form (Add Member) - HIDDEN/REMOVED functionality per user request, but defined in HTML so keeping listener or removing it?
+// User said "adding in team we will use Team code method only".
+// So we can ignore teamForm submit or leave it broken since UI is hidden.
+// I will just leave it but it won't be reachable.
+
 projectForm.addEventListener('submit', e => {
     e.preventDefault();
     addProject(e.target['project-name'].value);
     e.target.reset();
 });
+
+// Admin Modal Listeners
+if (manageTeamBtn) manageTeamBtn.addEventListener('click', window.openManageTeamModal);
+if (manageProjectBtn) manageProjectBtn.addEventListener('click', window.openManageProjectModal);
+if (closeTeamModalBtn) closeTeamModalBtn.addEventListener('click', () => teamModal.classList.add('hidden'));
+if (closeProjectModalBtn) closeProjectModalBtn.addEventListener('click', () => projectModal.classList.add('hidden'));
 
 // View Switching
 tabButtons.forEach(btn => {

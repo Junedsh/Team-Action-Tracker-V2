@@ -360,7 +360,7 @@
                     </svg></button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-1">
+                <div class="md:col-span-1 hidden"> <!-- User req: Hide Add Member Form, use Code instead -->
                     <h4 class="font-semibold mb-2">Add New Member</h4>
                     <form id="team-form" class="space-y-4">
                         <div><label for="member-name" class="block text-sm font-medium text-gray-700">Name</label><input
@@ -375,7 +375,7 @@
                             Member</button>
                     </form>
                 </div>
-                <div class="md:col-span-2">
+                <div class="md:col-span-3"> <!-- Expanded to full width since form is hidden -->
                     <h4 class="font-semibold mb-2">Current Team</h4>
                     <div class="overflow-y-auto max-h-64 border rounded-md">
                         <table class="min-w-full divide-y divide-gray-200">
