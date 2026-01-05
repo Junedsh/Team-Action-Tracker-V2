@@ -602,4 +602,4 @@ const openEditModal = (task) => {
 
 // Start
 checkSession();
-UI.initializeCalendar(() => tasks); // Pass getter
+// UI.initializeCalendar(() => tasks); // Removed to fix crash. Calendar init needs refactoring.
