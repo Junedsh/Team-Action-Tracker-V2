@@ -504,12 +504,14 @@ const rerenderAll = () => {
 
     // Filter Data
     let filtered = tasks.filter(t => {
+        // Use created_at for date filtering (assigned_date not in form)
+        const taskDate = t.created_at ? t.created_at.split('T')[0] : null; // Extract date part
         return (currentFilters.status === 'All' || t.status === currentFilters.status) &&
             (currentFilters.priority === 'All' || t.priority === currentFilters.priority) &&
             (currentFilters.owner === 'All' || t.owner === currentFilters.owner) &&
             (currentFilters.project === 'All' || t.project === currentFilters.project) &&
-            (!currentFilters.startDate || t.assigned_date >= currentFilters.startDate) &&
-            (!currentFilters.endDate || t.assigned_date <= currentFilters.endDate) &&
+            (!currentFilters.startDate || !taskDate || taskDate >= currentFilters.startDate) &&
+            (!currentFilters.endDate || !taskDate || taskDate <= currentFilters.endDate) &&
             (currentFilters.search === '' || t.description.toLowerCase().includes(currentFilters.search.toLowerCase()) || (t.owner && t.owner.toLowerCase().includes(currentFilters.search.toLowerCase())));
     });
 
