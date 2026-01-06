@@ -460,7 +460,7 @@ const fetchData = async () => {
 
     // 2. Fetch Team (Using V3 department_members + profiles)
     const { data: mData, error: mError } = await supabase.from('department_members')
-        .select('id, user_id, role, profiles(full_name, email)') // Selecting specific fields
+        .select('id, user_id, role, profiles(full_name)') // Removed email - column doesn't exist
         .eq('department_id', currentDepartment.id);
 
     console.log("Debug: Team Members Fetch", { mData, mError, deptId: currentDepartment.id }); // DEBUG
