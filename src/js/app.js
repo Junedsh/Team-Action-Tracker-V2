@@ -156,10 +156,12 @@ const openAddTeamModal = () => {
     authSubmitBtn.textContent = "Join / Create";
     signupFields.classList.remove('hidden');
 
-    // Hide Auth Credentials
     // Hide Auth Credentials & Name (Since already logged in)
     authEmail.parentElement.style.display = 'none';
     authPassword.parentElement.style.display = 'none';
+    authEmail.required = false;     // FIX: Prevent validation error on hidden field
+    authPassword.required = false;  // FIX: Prevent validation error on hidden field
+
     authName.parentElement.style.display = 'none'; // Hide Name Field
     toggleAuthModeBtn.style.display = 'none';
     authCloseBtn.classList.remove('hidden'); // Show Close Button
@@ -174,8 +176,14 @@ const closeAuthModal = () => {
     authName.parentElement.style.display = 'block';
     authEmail.parentElement.style.display = 'block';
     authPassword.parentElement.style.display = 'block';
+    authEmail.required = true;     // FIX: Restore validation
+    authPassword.required = true;  // FIX: Restore validation
+
     toggleAuthModeBtn.style.display = 'block';
     authCloseBtn.classList.add('hidden');
+
+    // Reset inputs
+    authForm.reset();
 };
 
 const handleAuth = async (e) => {
@@ -366,6 +374,12 @@ const updateAuthUI = async (user) => {
         // 3. Determine Active Team
         const lastActiveId = localStorage.getItem('active_department_id');
         let activeTeam = myTeams.find(t => t.department_id === lastActiveId);
+
+        // If saved team is invalid (or belongs to another user/session), reset it
+        if (lastActiveId && !activeTeam) {
+            console.log("Invalid active team in storage, clearing.");
+            localStorage.removeItem('active_department_id');
+        }
 
         // Default to first if not found
         if (!activeTeam) activeTeam = myTeams[0];
