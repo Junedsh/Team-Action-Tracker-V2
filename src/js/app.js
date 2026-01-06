@@ -198,12 +198,13 @@ const handleAuth = async (e) => {
         let userForSetup = currentUser; // Use existing user if logged in
 
         if (isSignUpMode || currentUser) {
-            // ... (SignUp Logic Remains Unchanged) ...
             // Validate V2 Fields
             const fullName = authName.value.trim();
-            // Name required if field is visible (Logic covers both Signup and Zombie User Recovery)
-            const isNameVisible = authName.parentElement.style.display !== 'none';
-            if (isNameVisible && !fullName) throw new Error("Full Name is required.");
+
+            // Simple check: Name is required in Sign Up mode (not for "Add Team" when already logged in)
+            if (isSignUpMode && !fullName) {
+                throw new Error("Full Name is required.");
+            }
 
             if (signupType.value === 'join' && !authTeamCode.value.trim()) throw new Error("Team Code is required.");
             if (signupType.value === 'create' && !authTeamName.value.trim()) throw new Error("Team Name is required.");
@@ -342,15 +343,23 @@ const updateAuthUI = async (user) => {
         console.log("Debug: Profile Fetch", { profile, pError }); // DEBUG LOG
 
         if (!profile) {
-            console.log("No profile found, but User requested to SKIP enforcement.");
-            // Use a dummy profile to allow access
-            // This effectively "Deletes" the dialog box behavior
-            currentUserProfile = { full_name: user.email.split('@')[0], email: user.email };
+            console.log("No profile found, creating one from user metadata...");
+            // Create actual profile in database
+            const userName = user.user_metadata?.full_name || user.email.split('@')[0];
+            const { error: createError } = await supabase.from('profiles').insert([
+                { id: user.id, full_name: userName, email: user.email }
+            ]);
+
+            if (createError) {
+                console.error("Could not create profile:", createError);
+                // Fallback to temporary profile if insert fails
+                currentUserProfile = { full_name: userName, email: user.email };
+            } else {
+                currentUserProfile = { full_name: userName, email: user.email };
+            }
         } else {
             currentUserProfile = profile;
         }
-
-        // 2. Fetch Teams (Memberships)
 
         // 2. Fetch Teams (Memberships)
         const { data: teams, error: tError } = await supabase.from('department_members')
@@ -358,6 +367,14 @@ const updateAuthUI = async (user) => {
             .eq('user_id', user.id);
 
         console.log("Debug: Teams Fetch", { teams, tError }); // DEBUG LOG
+
+        // CRITICAL: Handle fetch errors properly to prevent infinite loops
+        if (tError) {
+            console.error("CRITICAL: Cannot fetch teams due to RLS or DB error", tError);
+            alert(`Database error: Cannot load your teams.\n\nError: ${tError.message}\n\nPlease contact support or try signing out and back in.`);
+            await handleLogout();
+            return;
+        }
 
         myTeams = teams || [];
 
@@ -388,9 +405,7 @@ const updateAuthUI = async (user) => {
             role: activeTeam.role // Added Role
         };
 
-        // Render UI
-        authOverlay.classList.add('hidden');
-        mainContent.classList.remove('blur-sm', 'pointer-events-none');
+        // Render UI: Show main content, hide login
         authOverlay.classList.add('hidden');
         mainContent.classList.remove('blur-sm', 'pointer-events-none');
 
@@ -414,8 +429,7 @@ const updateAuthUI = async (user) => {
         fetchData();
 
     } else {
-        authOverlay.classList.remove('hidden');
-        mainContent.classList.add('blur-sm', 'pointer-events-none');
+        // User not logged in: Show login screen
         authOverlay.classList.remove('hidden');
         mainContent.classList.add('blur-sm', 'pointer-events-none');
 
