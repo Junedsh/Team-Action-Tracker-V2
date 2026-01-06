@@ -623,11 +623,11 @@ window.removeProject = async (projectId) => {
 const addTask = async (e) => {
     e.preventDefault();
     const formData = new FormData(taskForm);
-    const description = formData.get('task-desc');
+    const description = formData.get('task-description'); // Fixed: was 'task-desc'
     const project = formData.get('task-project');
     const priority = formData.get('task-priority');
-    const assignedDate = formData.get('task-assigned-date');
-    const promiseDate = formData.get('task-promise-date');
+    const assignedDate = formData.get('assigned-date'); // Fixed: no 'task-' prefix in HTML
+    const promiseDate = formData.get('promise-date'); // Fixed: no 'task-' prefix in HTML
     const status = formData.get('task-status');
     const comments = formData.get('task-comments');
 
