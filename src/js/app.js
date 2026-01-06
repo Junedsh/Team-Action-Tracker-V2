@@ -634,6 +634,9 @@ if (teamMenuBtn) teamMenuBtn.addEventListener('click', () => teamDropdown.classL
 
 // Forgot Password
 const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+const updatePasswordModal = document.getElementById('update-password-modal');
+const updatePasswordForm = document.getElementById('update-password-form');
+
 if (forgotPasswordBtn) {
     forgotPasswordBtn.addEventListener('click', async () => {
         const email = authEmail.value.trim();
@@ -650,10 +653,35 @@ if (forgotPasswordBtn) {
     });
 }
 
+if (updatePasswordForm) {
+    updatePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newPassword = document.getElementById('new-password').value;
+        const { error } = await Auth.updatePassword(newPassword);
+        if (error) {
+            alert("Error updating password: " + error.message);
+        } else {
+            alert("Password updated successfully!");
+            updatePasswordModal.classList.add('hidden');
+            // Check session to ensure UI is in correct state (should be logged in)
+            checkSession();
+        }
+    });
+}
+
 // Close dropdown if clicking outside
 document.addEventListener('click', (e) => {
     if (!teamMenuBtn.contains(e.target) && !teamDropdown.contains(e.target)) {
         teamDropdown.classList.add('hidden');
+    }
+});
+
+// Listener for Password Recovery Redirect
+Auth.onAuthStateChange(async (event, session) => {
+    console.log("Auth Event:", event);
+    if (event === 'PASSWORD_RECOVERY') {
+        // User clicked the reset link
+        updatePasswordModal.classList.remove('hidden');
     }
 });
 

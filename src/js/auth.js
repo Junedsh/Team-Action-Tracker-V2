@@ -44,3 +44,9 @@ export const resetPassword = async (email) => {
     });
     return { data, error };
 };
+
+// Update Password (Logged In user)
+export const updatePassword = async (newPassword) => {
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+    return { data, error };
+};
