@@ -435,7 +435,8 @@ const fetchData = async () => {
             user_id: m.user_id,
             name: m.profiles ? m.profiles.full_name : 'Unknown',
             email: m.profiles ? m.profiles.email : '',
-            role: m.role
+            role: m.role,
+            designation: m.role // UI uses 'designation'
         }));
     }
 
