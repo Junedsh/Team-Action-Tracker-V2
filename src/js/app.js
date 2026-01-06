@@ -420,10 +420,24 @@ const fetchData = async () => {
     if (tError) { console.error(tError); return; }
     tasks = tData;
 
-    // 2. Fetch Team
-    const { data: mData } = await supabase.from('team_members')
-        .select('*').eq('department_id', currentDepartment.id);
-    teamMembers = mData || [];
+    // 2. Fetch Team (Using V3 department_members + profiles)
+    const { data: mData, error: mError } = await supabase.from('department_members')
+        .select('id, user_id, role, profiles(full_name, email)') // Selecting specific fields
+        .eq('department_id', currentDepartment.id);
+
+    if (mError) {
+        console.error("Error fetching team:", mError);
+        teamMembers = [];
+    } else {
+        // Map to flat structure expected by UI
+        teamMembers = mData.map(m => ({
+            id: m.id, // Membership ID for deletion
+            user_id: m.user_id,
+            name: m.profiles ? m.profiles.full_name : 'Unknown',
+            email: m.profiles ? m.profiles.email : '',
+            role: m.role
+        }));
+    }
 
     // 3. Fetch Projects
     const { data: pData } = await supabase.from('projects')
