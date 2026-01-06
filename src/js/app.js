@@ -342,19 +342,15 @@ const updateAuthUI = async (user) => {
         console.log("Debug: Profile Fetch", { profile, pError }); // DEBUG LOG
 
         if (!profile) {
-            // Zombie User Fix: Missing Profile Row
-            console.log("No profile found, triggering setup");
-            openAddTeamModal();
-            authTitle.textContent = "Complete Profile";
-            authSubtitle.textContent = "Update your account for V3";
-            authEmail.value = user.email;
-            authEmail.readOnly = true;
-
-            // CRITICAL FIX: Show Name Field so it can be saved
-            authName.parentElement.style.display = 'block';
-            authName.value = user.user_metadata?.full_name || ''; // Try to autofill
-            return;
+            console.log("No profile found, but User requested to SKIP enforcement.");
+            // Use a dummy profile to allow access
+            // This effectively "Deletes" the dialog box behavior
+            currentUserProfile = { full_name: user.email.split('@')[0], email: user.email };
+        } else {
+            currentUserProfile = profile;
         }
+
+        // 2. Fetch Teams (Memberships)
 
         // 2. Fetch Teams (Memberships)
         const { data: teams, error: tError } = await supabase.from('department_members')
@@ -402,7 +398,7 @@ const updateAuthUI = async (user) => {
         logoutBtn.classList.remove('hidden');
         teamMenuBtn.classList.remove('hidden');
 
-        userNameDisplay.textContent = profile.full_name;
+        userNameDisplay.textContent = currentUserProfile.full_name;
         currentTeamDisplay.textContent = currentDepartment.name;
 
         updateRoleUI(currentDepartment.role); // Update Role UI
