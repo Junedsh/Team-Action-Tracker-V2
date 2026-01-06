@@ -293,160 +293,200 @@
             </div>
             <div id="tab-panel-project-view" class="p-6 hidden">
             </div>
-        </div>
-    </main>
-
-    <div id="task-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-title" class="text-xl font-semibold text-gray-800">Add New Task</h3><button
-                    id="close-task-modal-btn" class="text-gray-400 hover:text-gray-600"><svg class="h-6 w-6" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
-            </div>
-            <form id="task-form" class="space-y-4"><input type="hidden" id="task-id" name="task-id">
-                <div><label for="task-project" class="block text-sm font-medium text-gray-700">Project /
-                        Category</label><select id="task-project" name="task-project" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"></select>
-                </div>
-                <div><label for="task-description" class="block text-sm font-medium text-gray-700">Task
-                        Description</label><input type="text" id="task-description" name="task-description" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label for="task-owner" class="block text-sm font-medium text-gray-700">Owner</label>
-                        <p id="owner-helper-text" class="text-xs text-gray-500 hidden">Hold Ctrl/Cmd to select multiple.
-                        </p><select id="task-owner" name="task-owner" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"></select>
+            <!-- Update Password Modal (Recovery) -->
+            <div id="update-password-modal"
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-[200]">
+                <div class="relative top-32 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 id="modal-title" class="text-xl font-semibold text-gray-800">Update Password</h3><button
+                            id="close-update-password-modal-btn" class="text-gray-400 hover:text-gray-600"><svg
+                                class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg></button>
                     </div>
-                    <div><label for="task-priority"
-                            class="block text-sm font-medium text-gray-700">Priority</label><select id="task-priority"
-                            name="task-priority"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white">
-                            <option>Low</option>
-                            <option selected>Medium</option>
-                            <option>High</option>
-                            <option>Urgent</option>
-                        </select></div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label for="promise-date" class="block text-sm font-medium text-gray-700">Promise
-                            Date</label><input type="date" id="promise-date" name="promise-date" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-500">
-                    </div>
-                    <div><label for="task-status" class="block text-sm font-medium text-gray-700">Status</label><select
-                            id="task-status" name="task-status"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white">
-                            <option>Pending</option>
-                            <option>In Progress</option>
-                            <option>Done</option>
-                        </select></div>
-                </div>
-                <div><label for="task-comments"
-                        class="block text-sm font-medium text-gray-700">Comments</label><textarea id="task-comments"
-                        name="task-comments" rows="3"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"></textarea>
-                </div><button id="modal-submit-btn" type="submit"
-                    class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">Add
-                    Task</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="team-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-800">Manage Team</h3><button id="close-team-modal-btn"
-                    class="text-gray-400 hover:text-gray-600"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-1 hidden"> <!-- User req: Hide Add Member Form, use Code instead -->
-                    <h4 class="font-semibold mb-2">Add New Member</h4>
-                    <form id="team-form" class="space-y-4">
-                        <div><label for="member-name" class="block text-sm font-medium text-gray-700">Name</label><input
-                                type="text" id="member-name" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></div>
-                        <div><label for="member-designation"
-                                class="block text-sm font-medium text-gray-700">Designation</label><input type="text"
-                                id="member-designation" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></div><button
-                            type="submit"
-                            class="w-full py-2 px-4 rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Add
-                            Member</button>
-                    </form>
-                </div>
-                <div class="md:col-span-3"> <!-- Expanded to full width since form is hidden -->
-                    <h4 class="font-semibold mb-2">Current Team</h4>
-                    <div class="overflow-y-auto max-h-64 border rounded-md">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name
-                                    </th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Designation</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="team-list-body" class="bg-white divide-y divide-gray-200"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="project-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-800">Manage Projects</h3>
-                <button id="close-project-modal-btn" class="text-gray-400 hover:text-gray-600"><svg class="h-6 w-6"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-1">
-                    <h4 class="font-semibold mb-2">Add New Project</h4>
-                    <form id="project-form" class="space-y-4">
-                        <div><label for="project-name" class="block text-sm font-medium text-gray-700">Project
-                                Name</label><input type="text" id="project-name" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></div>
+                    <form id="update-password-form" class="space-y-4">
+                        <div>
+                            <label for="new-password" class="block text-sm font-medium text-gray-700">New
+                                Password</label>
+                            <input type="password" id="new-password" name="new-password" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                        </div>
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm
+                                Password</label>
+                            <input type="password" id="confirm-password" name="confirm-password" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                        </div>
                         <button type="submit"
-                            class="w-full py-2 px-4 rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Add
-                            Project</button>
+                            class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            Update Password
+                        </button>
                     </form>
                 </div>
-                <div class="md:col-span-1">
-                    <h4 class="font-semibold mb-2">Current Projects</h4>
-                    <div class="overflow-y-auto max-h-64 border rounded-md">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name
-                                    </th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="project-list-body" class="bg-white divide-y divide-gray-200"></tbody>
-                        </table>
+            </div>
+            <div id="task-modal"
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 id="modal-title" class="text-xl font-semibold text-gray-800">Add New Task</h3><button
+                            id="close-task-modal-btn" class="text-gray-400 hover:text-gray-600"><svg class="h-6 w-6"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg></button>
+                    </div>
+                    <form id="task-form" class="space-y-4"><input type="hidden" id="task-id" name="task-id">
+                        <div><label for="task-project" class="block text-sm font-medium text-gray-700">Project /
+                                Category</label><select id="task-project" name="task-project" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"></select>
+                        </div>
+                        <div><label for="task-description" class="block text-sm font-medium text-gray-700">Task
+                                Description</label><input type="text" id="task-description" name="task-description"
+                                required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label for="task-owner" class="block text-sm font-medium text-gray-700">Owner</label>
+                                <p id="owner-helper-text" class="text-xs text-gray-500 hidden">Hold Ctrl/Cmd to select
+                                    multiple.
+                                </p><select id="task-owner" name="task-owner" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"></select>
+                            </div>
+                            <div><label for="task-priority"
+                                    class="block text-sm font-medium text-gray-700">Priority</label><select
+                                    id="task-priority" name="task-priority"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white">
+                                    <option>Low</option>
+                                    <option selected>Medium</option>
+                                    <option>High</option>
+                                    <option>Urgent</option>
+                                </select></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label for="promise-date" class="block text-sm font-medium text-gray-700">Promise
+                                    Date</label><input type="date" id="promise-date" name="promise-date" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-500">
+                            </div>
+                            <div><label for="task-status"
+                                    class="block text-sm font-medium text-gray-700">Status</label><select
+                                    id="task-status" name="task-status"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white">
+                                    <option>Pending</option>
+                                    <option>In Progress</option>
+                                    <option>Done</option>
+                                </select></div>
+                        </div>
+                        <div><label for="task-comments"
+                                class="block text-sm font-medium text-gray-700">Comments</label><textarea
+                                id="task-comments" name="task-comments" rows="3"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"></textarea>
+                        </div><button id="modal-submit-btn" type="submit"
+                            class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">Add
+                            Task</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="team-modal"
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Manage Team</h3><button
+                            id="close-team-modal-btn" class="text-gray-400 hover:text-gray-600"><svg class="h-6 w-6"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg></button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1 hidden"> <!-- User req: Hide Add Member Form, use Code instead -->
+                            <h4 class="font-semibold mb-2">Add New Member</h4>
+                            <form id="team-form" class="space-y-4">
+                                <div><label for="member-name"
+                                        class="block text-sm font-medium text-gray-700">Name</label><input type="text"
+                                        id="member-name" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></div>
+                                <div><label for="member-designation"
+                                        class="block text-sm font-medium text-gray-700">Designation</label><input
+                                        type="text" id="member-designation" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></div>
+                                <button type="submit"
+                                    class="w-full py-2 px-4 rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Add
+                                    Member</button>
+                            </form>
+                        </div>
+                        <div class="md:col-span-3"> <!-- Expanded to full width since form is hidden -->
+                            <h4 class="font-semibold mb-2">Current Team</h4>
+                            <div class="overflow-y-auto max-h-64 border rounded-md">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                Name
+                                            </th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                Designation</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="team-list-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Modules -->
-    <script type="module" src="src/js/app.js?v=3.3"></script>
+            <div id="project-modal"
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Manage Projects</h3>
+                        <button id="close-project-modal-btn" class="text-gray-400 hover:text-gray-600"><svg
+                                class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg></button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-1">
+                            <h4 class="font-semibold mb-2">Add New Project</h4>
+                            <form id="project-form" class="space-y-4">
+                                <div><label for="project-name" class="block text-sm font-medium text-gray-700">Project
+                                        Name</label><input type="text" id="project-name" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></div>
+                                <button type="submit"
+                                    class="w-full py-2 px-4 rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Add
+                                    Project</button>
+                            </form>
+                        </div>
+                        <div class="md:col-span-1">
+                            <h4 class="font-semibold mb-2">Current Projects</h4>
+                            <div class="overflow-y-auto max-h-64 border rounded-md">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                Name
+                                            </th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="project-list-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modules -->
+            <script type="module" src="src/js/app.js?v=3.3"></script>
 </body>
 
 </html>
