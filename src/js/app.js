@@ -463,6 +463,8 @@ const fetchData = async () => {
         .select('id, user_id, role, profiles(full_name, email)') // Selecting specific fields
         .eq('department_id', currentDepartment.id);
 
+    console.log("Debug: Team Members Fetch", { mData, mError, deptId: currentDepartment.id }); // DEBUG
+
     if (mError) {
         console.error("Error fetching team:", mError);
         teamMembers = [];
@@ -476,6 +478,7 @@ const fetchData = async () => {
             role: m.role,
             designation: m.role // UI uses 'designation'
         }));
+        console.log("Debug: Mapped teamMembers", teamMembers); // DEBUG
     }
 
     // 3. Fetch Projects
