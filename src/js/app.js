@@ -197,7 +197,10 @@ const handleAuth = async (e) => {
     try {
         let userForSetup = currentUser; // Use existing user if logged in
 
-        if (isSignUpMode || currentUser) {
+        // Check if we're in a mode where signup/team fields are shown
+        const isTeamFlowActive = !signupFields.classList.contains('hidden');
+
+        if (isTeamFlowActive) {
             // Validate V2 Fields
             const fullName = authName.value.trim();
 
