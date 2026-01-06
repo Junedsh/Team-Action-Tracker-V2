@@ -193,8 +193,9 @@ const handleAuth = async (e) => {
             // ... (SignUp Logic Remains Unchanged) ...
             // Validate V2 Fields
             const fullName = authName.value.trim();
-            // Name required only if we don't have a profile yet (checking visibility is a proxy)
-            if (!currentUser && !fullName) throw new Error("Full Name is required.");
+            // Name required if field is visible (Logic covers both Signup and Zombie User Recovery)
+            const isNameVisible = authName.parentElement.style.display !== 'none';
+            if (isNameVisible && !fullName) throw new Error("Full Name is required.");
 
             if (signupType.value === 'join' && !authTeamCode.value.trim()) throw new Error("Team Code is required.");
             if (signupType.value === 'create' && !authTeamName.value.trim()) throw new Error("Team Name is required.");
@@ -333,12 +334,17 @@ const updateAuthUI = async (user) => {
         console.log("Debug: Profile Fetch", { profile, pError }); // DEBUG LOG
 
         if (!profile) {
-            // Zombie User Fix
+            // Zombie User Fix: Missing Profile Row
             console.log("No profile found, triggering setup");
             openAddTeamModal();
             authTitle.textContent = "Complete Profile";
+            authSubtitle.textContent = "Update your account for V3";
             authEmail.value = user.email;
             authEmail.readOnly = true;
+
+            // CRITICAL FIX: Show Name Field so it can be saved
+            authName.parentElement.style.display = 'block';
+            authName.value = user.user_metadata?.full_name || ''; // Try to autofill
             return;
         }
 
