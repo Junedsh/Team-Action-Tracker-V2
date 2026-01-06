@@ -504,14 +504,12 @@ const rerenderAll = () => {
 
     // Filter Data
     let filtered = tasks.filter(t => {
-        // Use created_at for date filtering (assigned_date not in form)
-        const taskDate = t.created_at ? t.created_at.split('T')[0] : null; // Extract date part
         return (currentFilters.status === 'All' || t.status === currentFilters.status) &&
             (currentFilters.priority === 'All' || t.priority === currentFilters.priority) &&
             (currentFilters.owner === 'All' || t.owner === currentFilters.owner) &&
             (currentFilters.project === 'All' || t.project === currentFilters.project) &&
-            (!currentFilters.startDate || !taskDate || taskDate >= currentFilters.startDate) &&
-            (!currentFilters.endDate || !taskDate || taskDate <= currentFilters.endDate) &&
+            (!currentFilters.startDate || !t.assigned_date || t.assigned_date >= currentFilters.startDate) &&
+            (!currentFilters.endDate || !t.assigned_date || t.assigned_date <= currentFilters.endDate) &&
             (currentFilters.search === '' || t.description.toLowerCase().includes(currentFilters.search.toLowerCase()) || (t.owner && t.owner.toLowerCase().includes(currentFilters.search.toLowerCase())));
     });
 
@@ -771,6 +769,15 @@ addTaskBtn.addEventListener('click', () => {
     taskForm.reset();
     delete taskForm.dataset.editingId;
     modalTitle.textContent = "New Task";
+
+    // Set default dates: Assigned = Today, Promise = Today + 7 days
+    const today = new Date();
+    const promiseDate = new Date(today);
+    promiseDate.setDate(today.getDate() + 7);
+
+    const formatDate = (d) => d.toISOString().split('T')[0];
+    document.getElementById('assigned-date').value = formatDate(today);
+    document.getElementById('promise-date').value = formatDate(promiseDate);
 
     // Populate Modal Selects
     const owners = [...new Set(teamMembers.map(m => m.name))];
