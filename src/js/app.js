@@ -5,6 +5,7 @@ import { formatDate, getStatusColors, getPriorityColors, calculatePromiseDiffere
 
 // --- STATE ---
 let currentUser = null;
+let currentUserProfile = null; // User's profile data
 let currentDepartment = null; // The ACTIVE department
 let myTeams = []; // List of all teams the user belongs to
 
