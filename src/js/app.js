@@ -770,10 +770,10 @@ addTaskBtn.addEventListener('click', () => {
     delete taskForm.dataset.editingId;
     modalTitle.textContent = "New Task";
 
-    // Set default dates: Assigned = Today, Promise = Today + 7 days
+    // Set default dates: Assigned = Today (hidden), Promise = Today + 2 days
     const today = new Date();
     const promiseDate = new Date(today);
-    promiseDate.setDate(today.getDate() + 7);
+    promiseDate.setDate(today.getDate() + 2); // Changed from 7 to 2 days
 
     const formatDate = (d) => d.toISOString().split('T')[0];
     document.getElementById('assigned-date').value = formatDate(today);

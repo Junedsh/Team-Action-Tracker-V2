@@ -364,16 +364,12 @@
                                 </select></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label for="assigned-date" class="block text-sm font-medium text-gray-700">Assigned
-                                    Date</label><input type="date" id="assigned-date" name="assigned-date" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-500">
-                            </div>
+                            <!-- Assigned Date: Hidden, auto-set to today -->
+                            <input type="hidden" id="assigned-date" name="assigned-date">
                             <div><label for="promise-date" class="block text-sm font-medium text-gray-700">Promise
                                     Date</label><input type="date" id="promise-date" name="promise-date" required
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border text-gray-500">
                             </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
                             <div><label for="task-status"
                                     class="block text-sm font-medium text-gray-700">Status</label><select
                                     id="task-status" name="task-status"
@@ -382,7 +378,6 @@
                                     <option>In Progress</option>
                                     <option>Done</option>
                                 </select></div>
-                            <div></div>
                         </div>
                         <div><label for="task-comments"
                                 class="block text-sm font-medium text-gray-700">Comments</label><textarea
