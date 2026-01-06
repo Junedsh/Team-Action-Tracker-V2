@@ -440,6 +440,12 @@ const rerenderAll = () => {
     UI.populateSelect(filterOwner, owners, "All Owners", currentFilters.owner);
     UI.populateSelect(filterProject, projNames, "All Projects", currentFilters.project);
 
+    // Populate Task Form Dropdowns (Add/Edit Modal)
+    const taskOwnerSelect = document.getElementById('task-owner');
+    const taskProjectSelect = document.getElementById('task-project');
+    if (taskOwnerSelect) UI.populateSelect(taskOwnerSelect, owners, "-- Select Owner --");
+    if (taskProjectSelect) UI.populateSelect(taskProjectSelect, projNames, "-- Select Project --");
+
     // Filter Data
     let filtered = tasks.filter(t => {
         return (currentFilters.status === 'All' || t.status === currentFilters.status) &&
