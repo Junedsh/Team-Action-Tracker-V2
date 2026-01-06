@@ -177,6 +177,7 @@ const closeAuthModal = () => {
 
 const handleAuth = async (e) => {
     e.preventDefault();
+    console.log("Debug: handleAuth triggered!");
     authErrorBox.classList.add('hidden');
 
     const email = authEmail.value;
@@ -607,8 +608,17 @@ const checkSession = async () => {
 };
 
 // Wiring Events
+console.log("App.js: Wiring Events...");
+console.log("Debug: Auth Form:", authForm);
+console.log("Debug: Auth Close Btn:", authCloseBtn);
+
 if (authCloseBtn) authCloseBtn.addEventListener('click', closeAuthModal);
-if (authForm) authForm.addEventListener('submit', handleAuth);
+if (authForm) {
+    authForm.addEventListener('submit', handleAuth);
+    console.log("Debug: attached handleAuth to authForm");
+} else {
+    console.error("CRITICAL: authForm not found in DOM!");
+}
 if (toggleAuthModeBtn) toggleAuthModeBtn.addEventListener('click', toggleAuthMode);
 if (btnModeJoin) btnModeJoin.addEventListener('click', () => setSignupType('join'));
 if (btnModeCreate) btnModeCreate.addEventListener('click', () => setSignupType('create'));
@@ -618,6 +628,24 @@ if (btnCreateAnotherTeam) btnCreateAnotherTeam.addEventListener('click', () => {
     openAddTeamModal();
 });
 if (teamMenuBtn) teamMenuBtn.addEventListener('click', () => teamDropdown.classList.toggle('hidden'));
+
+// Forgot Password
+const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', async () => {
+        const email = authEmail.value.trim();
+        if (!email) {
+            alert("Please enter your email address in the field above first.");
+            authEmail.focus();
+            return;
+        }
+        if (confirm(`Send password reset email to ${email}?`)) {
+            const { error } = await Auth.resetPassword(email);
+            if (error) alert("Error: " + error.message);
+            else alert("Password reset email sent! Check your inbox.");
+        }
+    });
+}
 
 // Close dropdown if clicking outside
 document.addEventListener('click', (e) => {
