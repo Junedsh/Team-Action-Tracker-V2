@@ -88,6 +88,9 @@ const searchInput = document.getElementById('search-input');
 const filterStatus = document.getElementById('filter-status');
 const filterPriority = document.getElementById('filter-priority');
 const filterOwner = document.getElementById('filter-owner'); // Dynamic
+const filterProject = document.getElementById('filter-project'); // Dynamic
+const filterDateStart = document.getElementById('filter-date-start');
+const filterDateEnd = document.getElementById('filter-date-end');
 // Admin Modals
 const manageTeamBtn = document.getElementById('manage-team-btn');
 const manageProjectBtn = document.getElementById('manage-project-btn');
