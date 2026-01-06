@@ -329,7 +329,9 @@ const updateAuthUI = async (user) => {
         currentUser = user;
 
         // 1. Fetch Profile
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        const { data: profile, error: pError } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        console.log("Debug: Profile Fetch", { profile, pError }); // DEBUG LOG
+
         if (!profile) {
             // Zombie User Fix
             console.log("No profile found, triggering setup");
@@ -341,9 +343,11 @@ const updateAuthUI = async (user) => {
         }
 
         // 2. Fetch Teams (Memberships)
-        const { data: teams, error } = await supabase.from('department_members')
+        const { data: teams, error: tError } = await supabase.from('department_members')
             .select('department_id, role, departments(name, access_code)')
             .eq('user_id', user.id);
+
+        console.log("Debug: Teams Fetch", { teams, tError }); // DEBUG LOG
 
         myTeams = teams || [];
 
