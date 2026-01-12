@@ -786,7 +786,11 @@ cancelTaskBtn.addEventListener('click', () => taskModal.classList.add('hidden'))
 addTaskBtn.addEventListener('click', () => {
     taskForm.reset();
     delete taskForm.dataset.editingId;
-    modalTitle.textContent = "New Task";
+    modalTitle.textContent = "Add New Task";
+
+    // Reset submit button text
+    const submitBtn = document.getElementById('modal-submit-btn');
+    if (submitBtn) submitBtn.textContent = "Add Task";
 
     // Set default dates: Assigned = Today (hidden), Promise = Today + 2 days
     const today = new Date();
@@ -869,6 +873,10 @@ tabButtons.forEach(btn => {
 const openEditModal = (task) => {
     taskForm.dataset.editingId = task.id;
     modalTitle.textContent = "Edit Task";
+
+    // Update submit button text
+    const submitBtn = document.getElementById('modal-submit-btn');
+    if (submitBtn) submitBtn.textContent = "Update Task";
 
     document.getElementById('task-description').value = task.description;
     document.getElementById('task-priority').value = task.priority;
