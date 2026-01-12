@@ -671,6 +671,144 @@ window.removeProject = async (projectId) => {
     }
 };
 
+// --- TASK HISTORY LOGGING ---
+const logTaskHistory = async (taskId, action, changes = []) => {
+    // changes is an array of { field_name, old_value, new_value }
+    try {
+        const historyEntries = changes.map(change => ({
+            task_id: parseInt(taskId),
+            changed_by: currentUser.id,
+            changed_by_name: currentUserProfile.full_name,
+            field_name: change.field_name,
+            old_value: change.old_value ? String(change.old_value) : null,
+            new_value: change.new_value ? String(change.new_value) : null,
+            action: action
+        }));
+
+        if (historyEntries.length > 0) {
+            const { error } = await supabase.from('task_history').insert(historyEntries);
+            if (error) {
+                console.error("Error logging task history:", error);
+            }
+        }
+    } catch (err) {
+        console.error("Failed to log task history:", err);
+    }
+};
+
+// Helper to compare old and new task values and return changes
+const getTaskChanges = (oldTask, newTask) => {
+    const changes = [];
+    const fieldsToTrack = [
+        { key: 'description', label: 'Description' },
+        { key: 'owner', label: 'Owner' },
+        { key: 'project', label: 'Project' },
+        { key: 'priority', label: 'Priority' },
+        { key: 'status', label: 'Status' },
+        { key: 'assigned_date', label: 'Assigned Date' },
+        { key: 'promise_date', label: 'Promise Date' },
+        { key: 'comments', label: 'Comments' }
+    ];
+
+    fieldsToTrack.forEach(field => {
+        const oldVal = oldTask[field.key] || '';
+        const newVal = newTask[field.key] || '';
+        if (oldVal !== newVal) {
+            changes.push({
+                field_name: field.label,
+                old_value: oldVal,
+                new_value: newVal
+            });
+        }
+    });
+
+    return changes;
+};
+
+// Function to show task history in modal
+window.showTaskHistory = async (taskId, taskDescription) => {
+    const historyModal = document.getElementById('history-modal');
+    const historyContent = document.getElementById('history-content');
+    const historyTaskTitle = document.getElementById('history-task-title');
+
+    if (!historyModal || !historyContent) return;
+
+    // Show loading state
+    historyTaskTitle.textContent = taskDescription;
+    historyContent.innerHTML = '<p class="text-gray-500 text-center py-4">Loading history...</p>';
+    historyModal.classList.remove('hidden');
+
+    try {
+        const { data: history, error } = await supabase
+            .from('task_history')
+            .select('*')
+            .eq('task_id', parseInt(taskId))
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Error fetching history:", error);
+            historyContent.innerHTML = '<p class="text-red-500 text-center py-4">Error loading history</p>';
+            return;
+        }
+
+        if (!history || history.length === 0) {
+            historyContent.innerHTML = '<p class="text-gray-500 text-center py-4">No history available for this task</p>';
+            return;
+        }
+
+        // Render history entries
+        historyContent.innerHTML = history.map(entry => {
+            const date = new Date(entry.created_at);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+
+            let actionText = '';
+            let actionIcon = '';
+            let bgColor = '';
+
+            if (entry.action === 'created') {
+                actionText = `<span class="font-medium">${entry.changed_by_name}</span> created this task`;
+                actionIcon = '🆕';
+                bgColor = 'bg-green-50 border-green-200';
+            } else if (entry.action === 'updated') {
+                if (entry.old_value && entry.new_value) {
+                    actionText = `<span class="font-medium">${entry.changed_by_name}</span> changed <span class="font-semibold">${entry.field_name}</span>: 
+                        <span class="text-red-600 line-through">${entry.old_value}</span> → 
+                        <span class="text-green-600">${entry.new_value}</span>`;
+                } else if (entry.new_value) {
+                    actionText = `<span class="font-medium">${entry.changed_by_name}</span> set <span class="font-semibold">${entry.field_name}</span> to <span class="text-green-600">${entry.new_value}</span>`;
+                } else {
+                    actionText = `<span class="font-medium">${entry.changed_by_name}</span> cleared <span class="font-semibold">${entry.field_name}</span>`;
+                }
+                actionIcon = '✏️';
+                bgColor = 'bg-blue-50 border-blue-200';
+            } else if (entry.action === 'deleted') {
+                actionText = `<span class="font-medium">${entry.changed_by_name}</span> deleted this task`;
+                actionIcon = '🗑️';
+                bgColor = 'bg-red-50 border-red-200';
+            }
+
+            return `
+                <div class="border rounded-lg p-3 ${bgColor}">
+                    <div class="flex items-start gap-2">
+                        <span class="text-lg">${actionIcon}</span>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-700">${actionText}</p>
+                            <p class="text-xs text-gray-400 mt-1">${formattedDate}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error("Unexpected error:", err);
+        historyContent.innerHTML = '<p class="text-red-500 text-center py-4">Unexpected error loading history</p>';
+    }
+};
+
 const addTask = async (e) => {
     e.preventDefault();
     const formData = new FormData(taskForm);
@@ -689,15 +827,28 @@ const addTask = async (e) => {
     const taskId = taskForm.dataset.editingId;
 
     if (taskId) {
-        // Update
-        const updates = {
+        // Update - First get the old task data for comparison
+        const oldTask = tasks.find(t => String(t.id) === String(taskId));
+
+        const newTaskData = {
             description, project,
-            owner: selectedOwners.join(', '), // Simple join for now
+            owner: selectedOwners.join(', '),
             priority, assigned_date: assignedDate, promise_date: promiseDate, status, comments,
             completed_date: status === 'Done' ? new Date().toISOString() : null
         };
-        const { error } = await supabase.from('tasks').update(updates).eq('id', taskId);
-        if (error) alert(error.message);
+
+        const { error } = await supabase.from('tasks').update(newTaskData).eq('id', taskId);
+        if (error) {
+            alert(error.message);
+        } else {
+            // Log the changes to task history
+            if (oldTask) {
+                const changes = getTaskChanges(oldTask, newTaskData);
+                if (changes.length > 0) {
+                    await logTaskHistory(taskId, 'updated', changes);
+                }
+            }
+        }
 
     } else {
         // Create (Handle multiple owners -> multiple tasks)
@@ -708,8 +859,17 @@ const addTask = async (e) => {
             completed_date: status === 'Done' ? assignedDate : null
         }));
 
-        const { error } = await supabase.from('tasks').insert(rows);
-        if (error) alert(error.message);
+        const { data: insertedTasks, error } = await supabase.from('tasks').insert(rows).select();
+        if (error) {
+            alert(error.message);
+        } else if (insertedTasks) {
+            // Log creation for each new task
+            for (const newTask of insertedTasks) {
+                await logTaskHistory(newTask.id, 'created', [
+                    { field_name: 'Task', old_value: null, new_value: description }
+                ]);
+            }
+        }
     }
     taskModal.classList.add('hidden');
     fetchData(); // Triggers Re-render

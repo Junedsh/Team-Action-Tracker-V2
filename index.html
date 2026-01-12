@@ -519,6 +519,39 @@
                     </div>
                 </div>
             </div>
+            <!-- Task History Modal -->
+            <div id="history-modal"
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-lg bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Task History
+                        </h3>
+                        <button id="close-history-modal-btn" class="text-gray-400 hover:text-gray-600">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="history-task-title" class="text-sm text-gray-600 mb-3 font-medium"></div>
+                    <div id="history-content" class="max-h-96 overflow-y-auto space-y-3">
+                        <!-- History entries will be rendered here -->
+                    </div>
+                    <div class="mt-4 text-right">
+                        <button id="close-history-btn"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Modules -->
             <script type="module" src="src/js/app.js?v=3.3"></script>

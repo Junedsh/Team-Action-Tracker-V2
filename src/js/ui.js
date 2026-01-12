@@ -74,6 +74,14 @@ export const renderTasks = (tasks, allTasks, openEditModal, currentUser, current
                     </svg>
                 </button>` : '';
 
+        // History button - always visible
+        const historyBtn = `
+                <button class="history-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-id="${task.id}" data-description="${task.description.replace(/"/g, '&quot;')}" title="View History">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                </button>`;
+
         row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 relative" ${tooltipAttr}>
                 ${task.description}
@@ -87,6 +95,7 @@ export const renderTasks = (tasks, allTasks, openEditModal, currentUser, current
             <td class="px-6 py-4 whitespace-nowrap text-sm"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${bg} ${text}">${label}</span></td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 flex items-center">
                 <button class="edit-btn text-indigo-600 hover:text-indigo-900 cursor-pointer" data-id="${task.id}">Edit</button>
+                ${historyBtn}
                 ${commentBtn}
                 ${deleteBtn}
             </td>`;
@@ -141,6 +150,29 @@ export const renderTasks = (tasks, allTasks, openEditModal, currentUser, current
     }
     if (closeCommentModalBtn) {
         closeCommentModalBtn.onclick = () => commentModal.classList.add('hidden');
+    }
+
+    // Attach click handlers for history buttons
+    document.querySelectorAll('.history-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const taskId = e.currentTarget.dataset.id;
+            const taskDescription = e.currentTarget.dataset.description;
+            if (window.showTaskHistory) {
+                await window.showTaskHistory(taskId, taskDescription);
+            }
+        });
+    });
+
+    // Close history modal handlers
+    const historyModal = document.getElementById('history-modal');
+    const closeHistoryBtn = document.getElementById('close-history-btn');
+    const closeHistoryModalBtn = document.getElementById('close-history-modal-btn');
+
+    if (closeHistoryBtn) {
+        closeHistoryBtn.onclick = () => historyModal.classList.add('hidden');
+    }
+    if (closeHistoryModalBtn) {
+        closeHistoryModalBtn.onclick = () => historyModal.classList.add('hidden');
     }
 };
 export const renderTaskList = renderTasks; // Alias
