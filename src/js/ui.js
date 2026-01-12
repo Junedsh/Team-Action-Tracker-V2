@@ -66,6 +66,14 @@ export const renderTasks = (tasks, allTasks, openEditModal, currentUser, current
                     </svg>
                 </button>` : '';
 
+        // Show comment icon only if task has comments
+        const commentBtn = task.comments ? `
+                <button class="comment-btn text-gray-500 hover:text-gray-700 cursor-pointer" data-comment="${task.comments.replace(/"/g, '&quot;')}" title="View Comment">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
+                    </svg>
+                </button>` : '';
+
         row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 relative" ${tooltipAttr}>
                 ${task.description}
@@ -79,6 +87,7 @@ export const renderTasks = (tasks, allTasks, openEditModal, currentUser, current
             <td class="px-6 py-4 whitespace-nowrap text-sm"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${bg} ${text}">${label}</span></td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 flex items-center">
                 <button class="edit-btn text-indigo-600 hover:text-indigo-900 cursor-pointer" data-id="${task.id}">Edit</button>
+                ${commentBtn}
                 ${deleteBtn}
             </td>`;
         taskTableBody.appendChild(row);
@@ -106,6 +115,14 @@ export const renderTasks = (tasks, allTasks, openEditModal, currentUser, current
                     alert('Delete function not available');
                 }
             }
+        });
+    });
+
+    // Attach click handlers for comment buttons
+    document.querySelectorAll('.comment-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const comment = e.currentTarget.dataset.comment;
+            alert('Comment:\n\n' + comment);
         });
     });
 };
