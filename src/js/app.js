@@ -604,21 +604,40 @@ const renderTeamManagementList = () => {
 window.removeTeamMember = async (memberId) => {
     if (!confirm("Are you sure you want to remove this member?")) return;
 
-    // We delete from department_members (junction table)
-    // Note: 'id' in teamMembers array comes from the VIEW which might select profile ID or department_member ID.
-    // Let's check fetchData. It selects '*' from department_members. Good.
+    console.log("Attempting to remove member with ID:", memberId, "Type:", typeof memberId);
 
-    const { error } = await supabase.from('department_members').delete().eq('id', memberId);
+    // Ensure memberId is an integer (Supabase uses int8 for id)
+    const memberIdInt = parseInt(memberId, 10);
 
-    if (error) {
-        alert("Error removing member: " + error.message);
-    } else {
-        // Remove from local array immediately for UI responsiveness
-        teamMembers = teamMembers.filter(m => m.id !== memberId);
-        renderTeamManagementList();
+    if (isNaN(memberIdInt)) {
+        alert("Invalid member ID");
+        return;
+    }
 
-        // Also refresh main data to update filters etc
-        fetchData();
+    try {
+        const { data, error } = await supabase
+            .from('department_members')
+            .delete()
+            .eq('id', memberIdInt)
+            .select();  // Add select to see what was deleted
+
+        console.log("Delete result - Data:", data, "Error:", error);
+
+        if (error) {
+            alert("Error removing member: " + error.message);
+            console.error("Supabase error:", error);
+        } else {
+            alert("Member removed successfully!");
+            // Remove from local array immediately for UI responsiveness
+            teamMembers = teamMembers.filter(m => m.id !== memberIdInt);
+            renderTeamManagementList();
+
+            // Also refresh main data to update filters etc
+            fetchData();
+        }
+    } catch (err) {
+        console.error("Unexpected error:", err);
+        alert("Unexpected error: " + err.message);
     }
 };
 
