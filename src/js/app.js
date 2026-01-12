@@ -779,8 +779,45 @@ if (filterDateEnd) {
     });
 }
 
+// Project Filter Listener
+if (filterProject) {
+    filterProject.addEventListener('change', (e) => {
+        currentFilters.project = e.target.value;
+        rerenderAll();
+    });
+}
 
-// ... Rest of listeners from previous app.js ...
+// Owner Filter Listener
+if (filterOwner) {
+    filterOwner.addEventListener('change', (e) => {
+        currentFilters.owner = e.target.value;
+        rerenderAll();
+    });
+}
+
+// Priority Filter Listener
+if (filterPriority) {
+    filterPriority.addEventListener('change', (e) => {
+        currentFilters.priority = e.target.value;
+        rerenderAll();
+    });
+}
+
+// Status Filter Listener
+if (filterStatus) {
+    filterStatus.addEventListener('change', (e) => {
+        currentFilters.status = e.target.value;
+        rerenderAll();
+    });
+}
+
+// Search Input Listener
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        currentFilters.search = e.target.value;
+        rerenderAll();
+    });
+}// ... Rest of listeners from previous app.js ...
 taskForm.addEventListener('submit', addTask);
 cancelTaskBtn.addEventListener('click', () => taskModal.classList.add('hidden'));
 addTaskBtn.addEventListener('click', () => {

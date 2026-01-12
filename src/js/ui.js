@@ -122,9 +122,26 @@ export const renderTasks = (tasks, allTasks, openEditModal, currentUser, current
     document.querySelectorAll('.comment-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const comment = e.currentTarget.dataset.comment;
-            alert('Comment:\n\n' + comment);
+            const modal = document.getElementById('comment-modal');
+            const content = document.getElementById('comment-content');
+            if (modal && content) {
+                content.textContent = comment;
+                modal.classList.remove('hidden');
+            }
         });
     });
+
+    // Close comment modal handlers
+    const commentModal = document.getElementById('comment-modal');
+    const closeCommentBtn = document.getElementById('close-comment-btn');
+    const closeCommentModalBtn = document.getElementById('close-comment-modal-btn');
+
+    if (closeCommentBtn) {
+        closeCommentBtn.onclick = () => commentModal.classList.add('hidden');
+    }
+    if (closeCommentModalBtn) {
+        closeCommentModalBtn.onclick = () => commentModal.classList.add('hidden');
+    }
 };
 export const renderTaskList = renderTasks; // Alias
 
