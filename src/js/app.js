@@ -452,6 +452,17 @@ const updateAuthUI = async (user) => {
 // Expose switch function to window for HTML click handlers
 window.switchTeam = (id) => setActiveTeam(id);
 
+// Delete task function (exposed for UI handlers)
+window.deleteTask = async (taskId) => {
+    const { error } = await supabase.from('tasks').delete().eq('id', taskId);
+    if (error) {
+        alert('Error deleting task: ' + error.message);
+    } else {
+        // Refresh data instead of full page reload
+        await fetchData();
+    }
+};
+
 
 // --- PREVIOUS FETCH LOGIC (Updated filters to use department_id) ---
 

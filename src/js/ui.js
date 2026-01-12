@@ -81,11 +81,25 @@ export const renderTasks = (tasks, allTasks, openEditModal) => {
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const taskId = e.currentTarget.dataset.id;
-                const task = allTasks.find(t => t.id === taskId);
+                const task = allTasks.find(t => String(t.id) === String(taskId));
                 if (task) openEditModal(task);
             });
         });
     }
+
+    // Attach click handlers for delete buttons - use window.deleteTask if available
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const taskId = e.currentTarget.dataset.id;
+            if (confirm('Are you sure you want to delete this task?')) {
+                if (window.deleteTask) {
+                    await window.deleteTask(taskId);
+                } else {
+                    alert('Delete function not available');
+                }
+            }
+        });
+    });
 };
 export const renderTaskList = renderTasks; // Alias
 
@@ -260,7 +274,7 @@ export const renderCalendar = (tasks, calendar) => {
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,listWeek'
+                right: 'dayGridMonth,listMonth'
             },
             events: events,
             eventClick: function (info) {
