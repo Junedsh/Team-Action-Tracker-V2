@@ -532,7 +532,7 @@ const rerenderAll = () => {
 
     UI.renderSummaryCards(filtered);
 
-    if (currentView === 'list') UI.renderTaskList(filtered, tasks, openEditModal);
+    if (currentView === 'list') UI.renderTaskList(filtered, tasks, openEditModal, currentUserProfile, currentDepartment);
     if (currentView === 'kanban') UI.renderCharts(filtered, statusChart, priorityChart, ownerChart);
     if (currentView === 'calendar') UI.renderCalendar(filtered, calendarInstance);
     if (currentView === 'projects') UI.renderProjectView(filtered);
