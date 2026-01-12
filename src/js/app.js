@@ -1,7 +1,7 @@
 import supabase from './supabaseClient.js';
 import * as Auth from './auth.js';
 import * as UI from './ui.js';
-import { formatDate, getStatusColors, getPriorityColors, calculatePromiseDifference } from './utils.js';
+import { formatDate, isOverdue, getStatusColors, getPriorityColors, calculatePromiseDifference } from './utils.js';
 
 // --- STATE ---
 let currentUser = null;
@@ -513,6 +513,10 @@ const rerenderAll = () => {
     UI.populateSelect(filterOwner, owners, "All Owners", currentFilters.owner);
     UI.populateSelect(filterProject, projNames, "All Projects", currentFilters.project);
 
+    // Restore Priority and Status filter values (they are static HTML dropdowns)
+    if (filterPriority) filterPriority.value = currentFilters.priority;
+    if (filterStatus) filterStatus.value = currentFilters.status;
+
     // Populate Task Form Dropdowns (Add/Edit Modal)
     const taskOwnerSelect = document.getElementById('task-owner');
     const taskProjectSelect = document.getElementById('task-project');
@@ -521,7 +525,15 @@ const rerenderAll = () => {
 
     // Filter Data
     let filtered = tasks.filter(t => {
-        const statusMatch = currentFilters.status === 'All' || currentFilters.status === 'all' || t.status === currentFilters.status;
+        // Handle status filter - 'Overdue' is a special computed state
+        let statusMatch;
+        if (currentFilters.status === 'All' || currentFilters.status === 'all') {
+            statusMatch = true;
+        } else if (currentFilters.status === 'Overdue') {
+            statusMatch = isOverdue(t); // Check if task is overdue (past promise date and not Done)
+        } else {
+            statusMatch = t.status === currentFilters.status;
+        }
         const priorityMatch = currentFilters.priority === 'All' || currentFilters.priority === 'all' || t.priority === currentFilters.priority;
         const ownerMatch = currentFilters.owner === 'All' || currentFilters.owner === 'all' || t.owner === currentFilters.owner;
         const projectMatch = currentFilters.project === 'All' || currentFilters.project === 'all' || t.project === currentFilters.project;
