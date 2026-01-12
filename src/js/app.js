@@ -71,7 +71,7 @@ const btnCreateAnotherTeam = document.getElementById('btn-create-another-team');
 const logoutBtn = document.getElementById('logout-btn');
 
 const mainContent = document.getElementById('main-content');
-const tabButtons = document.querySelectorAll('.nav-btn');
+const tabButtons = document.querySelectorAll('.tab-btn');
 
 // Task Modal
 const addTaskBtn = document.getElementById('open-add-task-modal-btn');
@@ -815,9 +815,35 @@ if (closeProjectModalBtn) closeProjectModalBtn.addEventListener('click', () => p
 // View Switching
 tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-        tabButtons.forEach(b => b.classList.remove('border-indigo-600', 'text-indigo-600'));
+        // Update tab button styles
+        tabButtons.forEach(b => {
+            b.classList.remove('border-indigo-600', 'text-indigo-600');
+            b.classList.add('border-transparent', 'text-gray-500');
+        });
         btn.classList.add('border-indigo-600', 'text-indigo-600');
+        btn.classList.remove('border-transparent', 'text-gray-500');
+
+        // Update current view
         currentView = btn.dataset.view;
+
+        // Show/hide panels
+        const panels = ['tab-panel-list', 'tab-panel-dashboard', 'tab-panel-calendar', 'tab-panel-project-view'];
+        panels.forEach(panelId => {
+            const panel = document.getElementById(panelId);
+            if (panel) panel.classList.add('hidden');
+        });
+
+        // Map view to panel ID
+        const viewToPanelMap = {
+            'list': 'tab-panel-list',
+            'kanban': 'tab-panel-dashboard',
+            'calendar': 'tab-panel-calendar',
+            'projects': 'tab-panel-project-view'
+        };
+
+        const activePanel = document.getElementById(viewToPanelMap[currentView]);
+        if (activePanel) activePanel.classList.remove('hidden');
+
         rerenderAll();
     });
 });
@@ -825,11 +851,11 @@ const openEditModal = (task) => {
     taskForm.dataset.editingId = task.id;
     modalTitle.textContent = "Edit Task";
 
-    document.getElementById('task-desc').value = task.description;
+    document.getElementById('task-description').value = task.description;
     document.getElementById('task-priority').value = task.priority;
     document.getElementById('task-status').value = task.status;
-    document.getElementById('task-assigned-date').value = task.assigned_date;
-    document.getElementById('task-promise-date').value = task.promise_date || '';
+    document.getElementById('assigned-date').value = task.assigned_date;
+    document.getElementById('promise-date').value = task.promise_date || '';
     document.getElementById('task-comments').value = task.comments || '';
 
     // Project & Owner selects need current data

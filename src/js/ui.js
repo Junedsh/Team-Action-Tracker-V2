@@ -40,7 +40,7 @@ export const renderSummaryCards = (tasks) => {
         <div class="bg-red-100 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-red-800">${overdueTasks}</p><p class="text-sm text-red-600">Overdue</p></div>`;
 };
 
-export const renderTasks = (tasks, currentSort, attachActionListeners, updateSortIcons) => {
+export const renderTasks = (tasks, allTasks, openEditModal) => {
     taskTableBody.innerHTML = '';
     if (tasks.length === 0) {
         taskTableBody.innerHTML = `<tr><td colspan="8" class="text-center text-gray-500 py-4">No tasks match the current filters.</td></tr>`;
@@ -66,17 +66,26 @@ export const renderTasks = (tasks, currentSort, attachActionListeners, updateSor
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">${daysTaken}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${bg} ${text}">${label}</span></td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 flex items-center">
-                <button class="edit-btn text-indigo-600 hover:text-indigo-900" data-id="${task.id}">Edit</button>
-                <button class="delete-btn text-red-600 hover:text-red-900" data-id="${task.id}">
+                <button class="edit-btn text-indigo-600 hover:text-indigo-900 cursor-pointer" data-id="${task.id}">Edit</button>
+                <button class="delete-btn text-red-600 hover:text-red-900 cursor-pointer" data-id="${task.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h--3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
                     </svg>
                 </button>
             </td>`;
         taskTableBody.appendChild(row);
     });
-    attachActionListeners();
-    updateSortIcons();
+
+    // Attach click handlers for edit buttons
+    if (openEditModal) {
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const taskId = e.currentTarget.dataset.id;
+                const task = allTasks.find(t => t.id === taskId);
+                if (task) openEditModal(task);
+            });
+        });
+    }
 };
 export const renderTaskList = renderTasks; // Alias
 

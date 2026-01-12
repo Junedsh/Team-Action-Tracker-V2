@@ -227,16 +227,16 @@
             </div>
             <div class="border-b border-gray-200">
                 <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
-                    <button id="tab-list"
-                        class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Task
+                    <button id="tab-list" data-view="list"
+                        class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 border-indigo-600 text-indigo-600 font-medium text-sm cursor-pointer">Task
                         List</button>
-                    <button id="tab-dashboard"
-                        class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">Visual
+                    <button id="tab-dashboard" data-view="kanban"
+                        class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer">Visual
                         Dashboard</button>
-                    <button id="tab-calendar"
-                        class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">Calendar</button>
-                    <button id="tab-project-view"
-                        class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">Project
+                    <button id="tab-calendar" data-view="calendar"
+                        class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer">Calendar</button>
+                    <button id="tab-project-view" data-view="projects"
+                        class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer">Project
                         View</button>
                 </nav>
             </div>
