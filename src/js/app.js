@@ -31,10 +31,10 @@ const formatDateInput = (date) => {
 
 // Initial Filters
 let currentFilters = {
-    status: 'All',
-    priority: 'All',
-    owner: 'All',
-    project: 'All',
+    status: 'all',
+    priority: 'all',
+    owner: 'all',
+    project: 'all',
     search: '',
     startDate: formatDateInput(firstDay),
     endDate: formatDateInput(today)

@@ -226,8 +226,20 @@ export const populateSelect = (selectElement, items, defaultText, selectedValue)
         selectElement.innerHTML += `<option value="${item}">${item}</option>`;
     });
     // Restore selected value if provided
-    if (selectedValue !== undefined && selectedValue !== null) {
-        selectElement.value = selectedValue;
+    if (selectedValue !== undefined && selectedValue !== null && selectedValue !== '') {
+        // Find and select the matching option
+        const options = selectElement.querySelectorAll('option');
+        let found = false;
+        options.forEach(opt => {
+            if (opt.value === selectedValue) {
+                opt.selected = true;
+                found = true;
+            }
+        });
+        // Fallback to setting value directly
+        if (!found) {
+            selectElement.value = selectedValue;
+        }
     }
 };
 
