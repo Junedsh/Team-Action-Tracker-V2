@@ -172,12 +172,14 @@ export const renderProjects = (projects, deleteProject) => {
 
 export const populateDropdowns = (teamMembers, projects, currentFilters) => {
     // Projects
-    const currentProjectFilterValue = filterProject.value;
-    filterProject.innerHTML = '<option value="all">Filter by Project (All)</option>';
+    filterProject.innerHTML = '<option value="all">All Projects</option>';
     projects.sort((a, b) => a.name.localeCompare(b.name)).forEach(project => {
         filterProject.innerHTML += `<option value="${project.name}">${project.name}</option>`;
     });
-    filterProject.value = currentProjectFilterValue;
+    // Restore filter value from state
+    if (currentFilters && currentFilters.project) {
+        filterProject.value = currentFilters.project;
+    }
 
     const taskProjectSelect = document.getElementById('task-project');
     taskProjectSelect.innerHTML = '<option value="">-- Select a Project --</option>';
@@ -186,28 +188,47 @@ export const populateDropdowns = (teamMembers, projects, currentFilters) => {
     });
 
     // Owners
-    const currentOwnerFilterValue = filterOwner.value;
-    filterOwner.innerHTML = '<option value="all">Filter by Owner (All)</option>';
+    filterOwner.innerHTML = '<option value="all">All Owners</option>';
     ownerSelect.innerHTML = '';
     teamMembers.sort((a, b) => a.name.localeCompare(b.name)).forEach(member => {
         filterOwner.innerHTML += `<option value="${member.name}">${member.name}</option>`;
         ownerSelect.innerHTML += `<option value="${member.name}">${member.name}</option>`;
     });
-    filterOwner.value = currentOwnerFilterValue;
-    filterOwner.value = currentOwnerFilterValue;
+    // Restore filter value from state
+    if (currentFilters && currentFilters.owner) {
+        filterOwner.value = currentFilters.owner;
+    }
+
+    // Priority - restore from state
+    const priorityFilter = document.getElementById('filter-priority');
+    if (priorityFilter && currentFilters && currentFilters.priority) {
+        priorityFilter.value = currentFilters.priority;
+    }
+
+    // Status - restore from state
+    const statusFilter = document.getElementById('filter-status');
+    if (statusFilter && currentFilters && currentFilters.status) {
+        statusFilter.value = currentFilters.status;
+    }
 };
 
 // Alias for app.js compatibility
-export const populateSelect = (selectElement, items, defaultText) => {
-    // Since app.js calls this generically, we implement a simple version or redirect if specific
-    // Note: app.js calls UI.populateSelect(element, array, default)
+export const populateSelect = (selectElement, items, defaultText, selectedValue) => {
+    // Since app.js calls this generically, we implement a simple version
     selectElement.innerHTML = '';
     if (defaultText) {
-        selectElement.innerHTML += `<option value="">${defaultText}</option>`;
+        // Use 'all' as the value for "All X" options, empty string for "-- Select X --" prompts
+        const isAllOption = defaultText.toLowerCase().startsWith('all');
+        const defaultValue = isAllOption ? 'all' : '';
+        selectElement.innerHTML += `<option value="${defaultValue}">${defaultText}</option>`;
     }
     items.forEach(item => {
         selectElement.innerHTML += `<option value="${item}">${item}</option>`;
     });
+    // Restore selected value if provided
+    if (selectedValue !== undefined && selectedValue !== null) {
+        selectElement.value = selectedValue;
+    }
 };
 
 export const renderProjectView = (tasks) => {
