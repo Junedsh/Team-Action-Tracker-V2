@@ -521,13 +521,15 @@ const rerenderAll = () => {
 
     // Filter Data
     let filtered = tasks.filter(t => {
-        return (currentFilters.status === 'All' || t.status === currentFilters.status) &&
-            (currentFilters.priority === 'All' || t.priority === currentFilters.priority) &&
-            (currentFilters.owner === 'All' || t.owner === currentFilters.owner) &&
-            (currentFilters.project === 'All' || t.project === currentFilters.project) &&
-            (!currentFilters.startDate || !t.assigned_date || t.assigned_date >= currentFilters.startDate) &&
-            (!currentFilters.endDate || !t.assigned_date || t.assigned_date <= currentFilters.endDate) &&
-            (currentFilters.search === '' || t.description.toLowerCase().includes(currentFilters.search.toLowerCase()) || (t.owner && t.owner.toLowerCase().includes(currentFilters.search.toLowerCase())));
+        const statusMatch = currentFilters.status === 'All' || currentFilters.status === 'all' || t.status === currentFilters.status;
+        const priorityMatch = currentFilters.priority === 'All' || currentFilters.priority === 'all' || t.priority === currentFilters.priority;
+        const ownerMatch = currentFilters.owner === 'All' || currentFilters.owner === 'all' || t.owner === currentFilters.owner;
+        const projectMatch = currentFilters.project === 'All' || currentFilters.project === 'all' || t.project === currentFilters.project;
+        const startDateMatch = !currentFilters.startDate || !t.assigned_date || t.assigned_date >= currentFilters.startDate;
+        const endDateMatch = !currentFilters.endDate || !t.assigned_date || t.assigned_date <= currentFilters.endDate;
+        const searchMatch = currentFilters.search === '' || t.description.toLowerCase().includes(currentFilters.search.toLowerCase()) || (t.owner && t.owner.toLowerCase().includes(currentFilters.search.toLowerCase()));
+
+        return statusMatch && priorityMatch && ownerMatch && projectMatch && startDateMatch && endDateMatch && searchMatch;
     });
 
     UI.renderSummaryCards(filtered);
