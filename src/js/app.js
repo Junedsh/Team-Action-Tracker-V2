@@ -13,6 +13,12 @@ let tasks = [];
 let teamMembers = [];
 let projects = [];
 
+// Chart instances for Visual Dashboard
+let statusChart = { current: null };
+let priorityChart = { current: null };
+let ownerChart = { current: null };
+let calendarInstance = { current: null };
+
 // Default Dates (Current Month)
 const today = new Date();
 const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -515,8 +521,9 @@ const rerenderAll = () => {
 
     UI.renderSummaryCards(filtered);
 
-    if (currentView === 'list') UI.renderTaskList(filtered, tasks, openEditModal); // tasks passed for global stats if needed
-    if (currentView === 'kanban') UI.renderKanbanBoard(filtered, tasks, openEditModal);
+    if (currentView === 'list') UI.renderTaskList(filtered, tasks, openEditModal);
+    if (currentView === 'kanban') UI.renderCharts(filtered, statusChart, priorityChart, ownerChart);
+    if (currentView === 'calendar') UI.renderCalendar(filtered, calendarInstance);
     if (currentView === 'projects') UI.renderProjectView(filtered);
 };
 

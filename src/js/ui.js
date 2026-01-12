@@ -235,15 +235,42 @@ export const renderCharts = (tasks, statusChart, priorityChart, ownerChart) => {
 };
 
 export const renderCalendar = (tasks, calendar) => {
+    const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
+    // Check if FullCalendar is loaded
+    if (typeof FullCalendar === 'undefined') {
+        calendarEl.innerHTML = '<p class="text-center text-gray-500 py-8">Calendar library not loaded.</p>';
+        return;
+    }
+
     const events = tasks.map(task => ({
         id: task.id,
         title: `${task.owner}: ${task.description}`,
         start: task.promise_date,
         allDay: true,
-        color: getStatusColors(task).calendarColor,
+        color: getStatusColors(task).calendarColor || '#3B82F6',
         extendedProps: { task: task }
     }));
-    if (calendar.current) {
+
+    // Create calendar if not exists
+    if (!calendar.current) {
+        calendar.current = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek'
+            },
+            events: events,
+            eventClick: function (info) {
+                // Show task details on click
+                const task = info.event.extendedProps.task;
+                alert(`Task: ${task.description}\nOwner: ${task.owner}\nStatus: ${task.status}\nDue: ${task.promise_date}`);
+            }
+        });
+        calendar.current.render();
+    } else {
         calendar.current.removeAllEvents();
         calendar.current.addEventSource(events);
     }
