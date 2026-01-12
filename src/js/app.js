@@ -517,7 +517,7 @@ const rerenderAll = () => {
 
     if (currentView === 'list') UI.renderTaskList(filtered, tasks, openEditModal); // tasks passed for global stats if needed
     if (currentView === 'kanban') UI.renderKanbanBoard(filtered, tasks, openEditModal);
-    if (currentView === 'projects') UI.renderProjectView(projects, tasks);
+    if (currentView === 'projects') UI.renderProjectView(filtered);
 };
 
 // ... (Keep existing UI helper functions like switchTab, openEditModal unchanged mostly, just ensure Add calls use currentDepartment) ...
@@ -815,13 +815,14 @@ if (closeProjectModalBtn) closeProjectModalBtn.addEventListener('click', () => p
 // View Switching
 tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-        // Update tab button styles
+        // Update tab button styles - reset all to inactive state
         tabButtons.forEach(b => {
-            b.classList.remove('border-indigo-600', 'text-indigo-600');
+            b.classList.remove('border-indigo-600', 'text-indigo-600', 'hover:text-gray-700', 'hover:border-gray-300');
             b.classList.add('border-transparent', 'text-gray-500');
         });
-        btn.classList.add('border-indigo-600', 'text-indigo-600');
+        // Set clicked tab as active
         btn.classList.remove('border-transparent', 'text-gray-500');
+        btn.classList.add('border-indigo-600', 'text-indigo-600');
 
         // Update current view
         currentView = btn.dataset.view;
