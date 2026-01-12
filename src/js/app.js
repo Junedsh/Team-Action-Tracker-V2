@@ -211,8 +211,8 @@ const handleAuth = async (e) => {
             // Validate V2 Fields
             const fullName = authName.value.trim();
 
-            // Simple check: Name is required in Sign Up mode (not for "Add Team" when already logged in)
-            if (isSignUpMode && !fullName) {
+            // Simple check: Name is required in Sign Up mode ONLY if not already logged in
+            if (isSignUpMode && !currentUser && !fullName) {
                 throw new Error("Full Name is required.");
             }
 
